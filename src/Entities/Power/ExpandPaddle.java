@@ -1,4 +1,36 @@
 package Entities.Power;
 
-public class ExpandPaddle {
+import Entities.Paddle;
+import Entities.Ball;
+import Utils.Config;
+import javafx.scene.paint.Color;
+
+public class ExpandPaddle extends PowerUp {
+    private static final double EXPAND_FACTOR = 1.5;
+
+    public ExpandPaddle(double x, double y) {
+        super("ExpandPaddle", x, y);
+    }
+
+    @Override
+    public void start() {
+        super.start(); // Gọi parent start()
+    }
+
+    @Override
+    public void applyEffect(Paddle paddle, Ball ball) {
+        System.out.println("🔵 Expand Paddle activated!");
+        paddle.expand(EXPAND_FACTOR);
+
+        new java.util.Timer().schedule(
+                new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        paddle.resetSize();
+                        System.out.println("🔵 Expand Paddle deactivated");
+                    }
+                },
+                10000
+        );
+    }
 }
