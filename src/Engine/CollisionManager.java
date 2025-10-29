@@ -2,6 +2,7 @@ package Engine;
 
 import Entities.Ball;
 import Entities.Paddle;
+import Entities.Bricks.Brick;
 import Utils.Config;
 
 import java.util.List;
@@ -65,6 +66,44 @@ public class CollisionManager {
                 ", Angle: " + bounceAngle + "°, Speed: " + speed);
     }
 
+    public static boolean checkBallBrickCollision(Ball ball, Brick brick) {
+        if (!ball.isActive()) return false;
+
+        double ballX = ball.getPosition().x;
+        double ballY = ball.getPosition().y;
+        double ballRadius = ball.getRadius();
+
+        if (brick.collidesWith(ballX, ballY, ballRadius)) {
+            // Xác định hướng va chạm để nảy đúng hướng
+            double brickLeft = brick.getPosition().x;
+            double brickRight = brick.getPosition().x + brick.getWidth();
+            double brickTop = brick.getPosition().y;
+            double brickBottom = brick.getPosition().y + brick.getHeight();
+
+            // Tính khoảng cách từ tâm ball đến các cạnh brick
+            double overlapLeft = Math.abs(ballX - brickLeft);
+            double overlapRight = Math.abs(ballX - brickRight);
+            double overlapTop = Math.abs(ballY - brickTop);
+            double overlapBottom = Math.abs(ballY - brickBottom);
+
+            // Tìm hướng va chạm gần nhất
+            double minOverlap = Math.min(Math.min(overlapLeft, overlapRight),
+                    Math.min(overlapTop, overlapBottom));
+
+            if (minOverlap == overlapLeft || minOverlap == overlapRight) {
+                // Va chạm trái/phải - đảo ngược hướng X
+                ball.getVelocity().x = -ball.getVelocity().x;
+                System.out.println("Brick side collision - X reversed");
+            } else {
+                // Va chạm trên/dưới - đảo ngược hướng Y
+                ball.getVelocity().y = -ball.getVelocity().y;
+                System.out.println("Brick top/bottom collision - Y reversed");
+            }
+
+            return true;
+        }
+        return false;
+    }
 
     public static void checkWallCollisions(Ball ball) {
         if (!ball.isActive()) return;
