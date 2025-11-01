@@ -9,7 +9,7 @@ public class Config {
 
     // Vật lý game
     public static final double BALL_SPEED = 350.0;
-    public static final double PADDLE_SPEED = 350.0;
+    public static final double PADDLE_SPEED = 400.0;
     public static final double BONUS_BLOCK_SPEED = 70.0;
 
     // Kích thước đối tượng
