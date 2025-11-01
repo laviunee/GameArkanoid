@@ -286,7 +286,6 @@ public class GameScene extends SceneManager {
 
     private void checkCollisions() {
         List<Ball> ballsToRemove = new ArrayList<>();
-        boolean ballLost = false;
 
         for (Ball ball : balls) {
             if (!ball.isActive()) continue;
@@ -312,23 +311,29 @@ public class GameScene extends SceneManager {
 
             CollisionManager.checkWallCollisions(ball);
 
+            // Nếu bóng rơi khỏi màn hình
             if (ball.getPosition().y + ball.getRadius() >= Config.SCREEN_HEIGHT) {
                 System.out.println("Ball lost at bottom!");
                 ballsToRemove.add(ball);
-                ballLost = true;
-                lives--;
                 soundManager.playSound("lose");
-                System.out.println("Lives remaining: " + lives);
             }
         }
 
+        // Xóa các bóng đã rơi
         balls.removeAll(ballsToRemove);
 
-        if (ballLost && lives > 0 && balls.isEmpty()) {
-            System.out.println("Respawning NEW ball on paddle");
-            spawnBall();
+        // Chỉ trừ mạng khi KHÔNG còn bóng nào
+        if (balls.isEmpty()) {
+            lives--;
+            System.out.println("All balls lost! Lives remaining: " + lives);
+
+            if (lives > 0) {
+                System.out.println("Respawning NEW ball on paddle");
+                spawnBall();
+            }
         }
     }
+
 
     private void checkPowerUpCollisions() {
         List<PowerUp> collectedPowerUps = new ArrayList<>();
