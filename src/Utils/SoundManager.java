@@ -186,21 +186,40 @@ public class SoundManager {
     // ← GAME EVENT METHODS
     public void onGameStart() {
         System.out.println("Game starting...");
-        stopMenuMusic();           // Dừng nhạc menu
-        playSound("game_start");   // Phát sound bắt đầu game
-        playBackgroundMusic();     // Phát nhạc nền game
+        stopAllSounds();           // Dừng toàn bộ âm thanh trước đó
+        if (soundEnabled && initialized) {
+            playSound("game_start");   // Phát hiệu ứng bắt đầu
+            playBackgroundMusic();     // Phát lại nhạc nền game
+        }
     }
+
 
     public void onGameOver() {
         System.out.println("Game over...");
-        stopBackgroundMusic();     // Dừng nhạc nền game
-        playSound("lose");         // Phát sound game over
+        stopBackgroundMusic();
+        stopMenuMusic();
+        if (soundEnabled && initialized) {
+            AudioClip clip = soundEffects.get("lose");
+            if (clip != null) {
+                clip.stop(); // đảm bảo không chồng
+                clip.play();
+                System.out.println("Playing lose sound...");
+            }
+        }
     }
 
     public void onGameWin() {
         System.out.println("Game win!");
-        stopBackgroundMusic();     // Dừng nhạc nền game
-        playSound("win");          // Phát sound win
+        stopBackgroundMusic();
+        stopMenuMusic();
+        if (soundEnabled && initialized) {
+            AudioClip clip = soundEffects.get("win");
+            if (clip != null) {
+                clip.stop();
+                clip.play();
+                System.out.println("Playing win sound...");
+            }
+        }
     }
 
     public void onReturnToMenu() {
@@ -219,18 +238,14 @@ public class SoundManager {
         this.soundEnabled = enabled;
 
         if (!enabled) {
-            stopAllSounds(); // nếu tắt -> dừng tất cả
-            System.out.println("🎵 Sound disabled");
+            stopAllSounds();
+            System.out.println("Sound disabled");
         } else {
-            // nếu bật -> phát lại nhạc menu hoặc background tùy ngữ cảnh
-            if (menuMusic != null) {
-                playMenuMusic();
-            } else if (backgroundMusic != null) {
-                playBackgroundMusic();
-            }
-            System.out.println("🎵 Sound enabled");
+            System.out.println("Sound enabled");
+            playMenuMusic(); // bật lại nhạc menu
         }
     }
+
 
     public void toggleSound() {
         setSoundEnabled(!soundEnabled);

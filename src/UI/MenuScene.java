@@ -357,17 +357,20 @@ public class MenuScene extends SceneManager {
     }
 
     private void adjustOption(int direction) {
-        // Placeholder
+        // Chỉ xử lý khi đang chọn mục SOUND
+        if (currentState == MenuState.OPTIONS && selectedOption == 0) {
+            boolean current = soundManager.isSoundEnabled();
+            soundManager.setSoundEnabled(!current);
+        }
     }
+
 
     private void toggleSound() {
         boolean newState = !soundManager.isSoundEnabled();
         soundManager.setSoundEnabled(newState);
 
-        // cập nhật trạng thái nhạc khi bật lại
-        if (newState) {
-            soundManager.playMenuMusic();
-        }
+        //ép vẽ lại menu để cập nhật dòng "SOUND: ON/OFF"
+        render();
     }
 
 
