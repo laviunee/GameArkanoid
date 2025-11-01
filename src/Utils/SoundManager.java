@@ -212,15 +212,24 @@ public class SoundManager {
     // ==================== GETTERS/SETTERS ====================
 
     public boolean isSoundEnabled() {
-        return soundEnabled && initialized;
+        return soundEnabled;
     }
 
     public void setSoundEnabled(boolean enabled) {
         this.soundEnabled = enabled;
+
         if (!enabled) {
-            stopAllSounds();
+            stopAllSounds(); // nếu tắt -> dừng tất cả
+            System.out.println("🎵 Sound disabled");
+        } else {
+            // nếu bật -> phát lại nhạc menu hoặc background tùy ngữ cảnh
+            if (menuMusic != null) {
+                playMenuMusic();
+            } else if (backgroundMusic != null) {
+                playBackgroundMusic();
+            }
+            System.out.println("🎵 Sound enabled");
         }
-        System.out.println("🎵 Sound " + (enabled ? "enabled" : "disabled"));
     }
 
     public void toggleSound() {

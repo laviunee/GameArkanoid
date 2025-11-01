@@ -363,7 +363,13 @@ public class MenuScene extends SceneManager {
     private void toggleSound() {
         boolean newState = !soundManager.isSoundEnabled();
         soundManager.setSoundEnabled(newState);
+
+        // cập nhật trạng thái nhạc khi bật lại
+        if (newState) {
+            soundManager.playMenuMusic();
+        }
     }
+
 
     private void exitGame() {
         System.exit(0);
