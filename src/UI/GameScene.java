@@ -115,6 +115,8 @@ public class GameScene extends SceneManager {
 
         balls = new ArrayList<>();
         spawnBall();
+        Entities.Power.PowerFactory.setBalls(balls);
+
 
         bricks = new ArrayList<>();
         setupBricks();
@@ -464,6 +466,8 @@ public class GameScene extends SceneManager {
                 powerupImage = powerupExpandImage;
             } else if (powerUp instanceof Entities.Power.FastBall) {
                 powerupImage = powerupFastballImage;
+            } else if (powerUp instanceof Entities.Power.PowerUpMultiBall) {
+                powerupImage = ballImage; //DÙNG HÌNH BALL
             }
 
             if (powerupImage != null) {

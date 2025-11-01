@@ -50,7 +50,7 @@ public class Ball extends MovableObject {
         this.active = active;
         this.onPaddle = !active; // ← KHI ACTIVE THÌ KHÔNG CÒN Ở TRÊN PADDLE
         if (active) {
-            System.out.println("🎾 Ball launched!");
+            System.out.println("Ball launched!");
         }
     }
 
@@ -77,4 +77,5 @@ public class Ball extends MovableObject {
     public Color getColor() {
         return color;
     }
+
 }

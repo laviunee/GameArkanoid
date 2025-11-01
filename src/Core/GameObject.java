@@ -1,7 +1,8 @@
 package Core;
 
 import Utils.Vector2D;
-
+import javafx.scene.image.Image;
+import javafx.scene.canvas.GraphicsContext;
 /**
  * Lớp cha cho mọi đối tượng trong game
  */
@@ -9,6 +10,7 @@ public abstract class GameObject {
     protected String name;
     protected boolean active = true;
     protected Vector2D position;
+    protected Image sprite;
 
     public GameObject(String name) {
         this.name = name;
@@ -18,6 +20,22 @@ public abstract class GameObject {
     public GameObject(String name, double x, double y) {
         this(name);
         this.position.set(x, y);
+    }
+
+    // thêm getter & setter cho sprite
+    public void setSprite(Image sprite) {
+        this.sprite = sprite;
+    }
+
+    public Image getSprite() {
+        return sprite;
+    }
+
+    // thêm hàm render để vẽ hình (nếu có)
+    public void render(GraphicsContext gc) {
+        if (sprite != null && active) {
+            gc.drawImage(sprite, position.x, position.y);
+        }
     }
 
     // Phương thức trừu tượng
