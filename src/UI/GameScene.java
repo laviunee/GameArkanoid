@@ -1,6 +1,7 @@
 package UI;
 
 import Engine.CollisionManager;
+import Engine.GameEngine;
 import Engine.SceneManager;
 import Entities.Ball;
 import Entities.Paddle;
@@ -35,7 +36,8 @@ public class GameScene extends SceneManager {
     private int lives;
     private boolean isRunning;
 
-    // THÊM: Pause scene và trạng thái pause
+    // Pause scene và trạng thái pause
+    private GameEngine gameEngine;
     private PauseScene pauseScene;
     private boolean isPaused = false;
 
@@ -52,15 +54,13 @@ public class GameScene extends SceneManager {
     private javafx.scene.image.Image powerupFastballImage;
     private javafx.scene.image.Image powerupMultiballImage;
 
-    public GameScene(GraphicsContext ctx) {
+    public GameScene(GraphicsContext ctx, GameEngine gameEngine) {
         this.ctx = ctx;
+        this.gameEngine = gameEngine;
         this.soundManager = SoundManager.getInstance();
         this.spriteLoader = SpriteLoader.getInstance();
         this.isRunning = true;
-
-        // THÊM: Khởi tạo PauseScene
-        this.pauseScene = new PauseScene(ctx, this::resumeGame, this::returnToMainMenu);
-
+        this.pauseScene = null; //PauseScene sẽ được GameEngine quản lý
         loadGameSprites();
     }
 
@@ -169,21 +169,10 @@ public class GameScene extends SceneManager {
         drawPaddle();
         drawBalls();
         drawUI();
-
-        // Render pause menu nếu đang pause
-        if (isPaused) {
-            pauseScene.render();
-        }
     }
 
     @Override
     public void handleInput(KeyEvent event) {
-        // Nếu đang pause, chuyển input sang pauseScene
-        if (isPaused) {
-            pauseScene.handleInput(event);
-            return;
-        }
-
         if (event.getEventType() == KeyEvent.KEY_PRESSED) {
             switch (event.getCode()) {
                 case LEFT, A -> movePaddleLeft();
@@ -194,8 +183,13 @@ public class GameScene extends SceneManager {
                     soundManager.setSoundEnabled(!currentState);
                     System.out.println("Sound toggled from " + currentState + " to " + soundManager.isSoundEnabled());
                 }
-                // THÊM: Phím để pause game
-                case P, ESCAPE -> togglePause();
+                // Gọi GameEngine để pause
+                case P, ESCAPE -> {
+                    if (!isPaused) {
+                        gameEngine.pauseGame();
+                        isPaused = true;
+                    }
+                }
             }
         }
 
@@ -219,13 +213,19 @@ public class GameScene extends SceneManager {
         }
     }
 
+    // Method để resume từ GameEngine
+    public void resumeFromPause() {
+        isPaused = false;
+        System.out.println("GameScene resumed from pause");
+    }
+
     @Override
     public void cleanup() {
         System.out.println("Cleaning up Game Scene...");
         balls.clear();
         bricks.clear();
         powerUps.clear();
-        isPaused = false; // THÊM: Đảm bảo reset trạng thái pause
+        isPaused = false; // Đảm bảo reset trạng thái pause
     }
 
     // === CÁC METHOD GAME LOGIC ===
@@ -574,6 +574,5 @@ public class GameScene extends SceneManager {
     public boolean isRunning() { return isRunning; }
     public int getScore() { return score; }
     public int getLives() { return lives; }
-    // THÊM: Getter cho trạng thái pause
     public boolean isPaused() { return isPaused; }
 }

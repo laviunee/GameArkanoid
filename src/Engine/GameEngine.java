@@ -2,6 +2,7 @@ package Engine;
 
 import UI.GameScene;
 import UI.MenuScene;
+import UI.PauseScene;
 import Utils.Config;
 import Utils.SoundManager;
 import javafx.animation.AnimationTimer;
@@ -21,6 +22,7 @@ public class GameEngine extends Application {
     private boolean isRunning = false;
     private long lastUpdateTime;
 
+    private PauseScene pauseScene;
     private SceneManager currentScene;
     private GameScene gameScene;
     private MenuScene menuScene;
@@ -59,7 +61,13 @@ public class GameEngine extends Application {
             switchToGameScene();
         });
 
-        gameScene = new GameScene(ctx);
+        gameScene = new GameScene(ctx, this);
+
+        // Khởi tạo PauseScene với các callback
+        pauseScene = new PauseScene(ctx,
+                this::resumeGame,
+                this::restartGame,
+                this::switchToMenuScene);
 
         // Bắt đầu với Menu
         currentScene = menuScene;
@@ -144,6 +152,34 @@ public class GameEngine extends Application {
         currentScene.start();
         soundManager.onReturnToMenu();
         System.out.println("Switched to Menu Scene");
+    }
+
+    public void pauseGame() {
+        if (currentScene == gameScene) {
+            currentScene = pauseScene;
+            currentScene.start();
+            System.out.println("Game paused");
+        }
+    }
+
+    public void resumeGame() {
+        if (currentScene == pauseScene) {
+            currentScene = gameScene;
+            ((GameScene) gameScene).resumeFromPause(); // Thông báo resume
+            System.out.println("Game resumed");
+        }
+    }
+
+    public void restartGame() {
+        System.out.println("Restarting game...");
+        if (currentScene != null) currentScene.cleanup();
+
+        // Tạo game scene mới
+        gameScene = new GameScene(ctx, this);
+        currentScene = gameScene;
+        currentScene.start();
+
+        System.out.println("Game restarted");
     }
 
     @Override

@@ -6,6 +6,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 
 /**
  * PauseScene - Cảnh tạm dừng game
@@ -13,6 +14,7 @@ import javafx.scene.text.Font;
 public class PauseScene extends SceneManager {
     private GraphicsContext ctx;
     private Runnable onResumeGame;
+    private Runnable onRestartGame;
     private Runnable onReturnToMenu;
 
     private boolean isActive;
@@ -23,9 +25,10 @@ public class PauseScene extends SceneManager {
     private Font optionFont;
     private Font infoFont;
 
-    public PauseScene(GraphicsContext ctx, Runnable onResumeGame, Runnable onReturnToMenu) {
+    public PauseScene(GraphicsContext ctx, Runnable onResumeGame, Runnable onRestartGame, Runnable onReturnToMenu) {
         this.ctx = ctx;
         this.onResumeGame = onResumeGame;
+        this.onRestartGame = onRestartGame;
         this.onReturnToMenu = onReturnToMenu;
 
         this.titleFont = Font.font("Arial", 36);
@@ -36,7 +39,6 @@ public class PauseScene extends SceneManager {
 
     @Override
     public void start() {
-
         isActive = true;
         selectedOption = 0;
 
@@ -113,8 +115,9 @@ public class PauseScene extends SceneManager {
     }
 
     private void restartLevel() {
-        // by the GameEngine
-        resumeGame(); // just resume
+        if (onRestartGame != null) {
+            onRestartGame.run();
+        }
     }
 
     private void returnToMenu() {
@@ -129,30 +132,41 @@ public class PauseScene extends SceneManager {
     }
 
     private void drawPauseMenu() {
+        // Lưu alignment hiện tại
+        TextAlignment originalAlignment = ctx.getTextAlign();
+
+        // Căn giữa tất cả
+        ctx.setTextAlign(TextAlignment.CENTER);
+        double centerX = Config.SCREEN_WIDTH / 2;
+
+        // Tiêu đề
         ctx.setFont(titleFont);
         ctx.setFill(Color.YELLOW);
-        ctx.fillText("GAME PAUSED", Config.SCREEN_WIDTH / 2 - 100, 150);
+        ctx.fillText("GAME PAUSED", centerX, 200);
 
         ctx.setFont(optionFont);
         for (int i = 0; i < pauseOptions.length; i++) {
             if (i == selectedOption) {
                 ctx.setFill(Color.CYAN);
                 ctx.fillText("> " + pauseOptions[i] + " <",
-                        Config.SCREEN_WIDTH / 2 - 80,
-                        250 + i * 50);
+                        centerX,
+                        280 + i * 50);
             } else {
                 ctx.setFill(Color.WHITE);
                 ctx.fillText(pauseOptions[i],
-                        Config.SCREEN_WIDTH / 2 - 60,
-                        250 + i * 50);
+                        centerX,
+                        280 + i * 50);
             }
         }
 
         ctx.setFont(infoFont);
         ctx.setFill(Color.LIGHTGRAY);
-        ctx.fillText("USE ↑↓ TO NAVIGATE", Config.SCREEN_WIDTH / 2 - 70, 400);
-        ctx.fillText("PRESS ENTER TO SELECT", Config.SCREEN_WIDTH / 2 - 80, 425);
-        ctx.fillText("PRESS P OR ESC TO RESUME", Config.SCREEN_WIDTH / 2 - 90, 450);
+        ctx.fillText("USE ↑↓ TO NAVIGATE", centerX, 425);
+        ctx.fillText("PRESS ENTER TO SELECT", centerX, 450);
+        ctx.fillText("PRESS P OR ESC TO RESUME", centerX, 475);
+
+        // Reset về alignment ban đầu
+        ctx.setTextAlign(originalAlignment);
     }
 
     public boolean isActive() { return isActive; }
