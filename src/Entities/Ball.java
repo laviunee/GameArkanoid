@@ -8,7 +8,14 @@ public class Ball extends MovableObject {
     private double radius;
     private boolean active;
     private boolean onPaddle;
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     private Color color;
+    private boolean pierce = false;
+
 
     public Ball(double x, double y) {
         super("Ball", x, y);
@@ -19,6 +26,15 @@ public class Ball extends MovableObject {
 
         setVelocity(0, 0);
     }
+
+    public void setPierce(boolean pierce) {
+        this.pierce = pierce;
+    }
+
+    public boolean isPierce() {
+        return pierce;
+    }
+
 
     @Override
     public void start() {

@@ -60,6 +60,8 @@ public class GameScene extends SceneManager {
     private javafx.scene.image.Image powerupExpandImage;
     private javafx.scene.image.Image powerupFastballImage;
     private javafx.scene.image.Image powerupMultiballImage;
+    private javafx.scene.image.Image pierceImage;
+
 
     public GameScene(GraphicsContext ctx, GameEngine gameEngine) {
         this.ctx = ctx;
@@ -161,6 +163,7 @@ public class GameScene extends SceneManager {
             // Load ball
             ballImage = spriteLoader.loadSprite("/images/ball.png");
 
+
             // Load bricks
             brickNormalImage = spriteLoader.loadSprite("/images/bricks/normal.png");
             brickStrongImage = spriteLoader.loadSprite("/images/bricks/strong.png");
@@ -170,7 +173,7 @@ public class GameScene extends SceneManager {
             powerupExpandImage = spriteLoader.loadSprite("/images/powerup/expand.png");
             powerupFastballImage = spriteLoader.loadSprite("/images/powerup/fastball.png");
             powerupMultiballImage = spriteLoader.loadSprite("/images/powerup/multiball.png");
-
+            pierceImage = spriteLoader.loadSprite("/images/powerup/pierce.png");
             System.out.println("Game sprites loaded successfully");
 
         } catch (Exception e) {
@@ -387,15 +390,27 @@ public class GameScene extends SceneManager {
 
             for (Brick brick : bricks) {
                 if (CollisionManager.checkBallBrickCollision(ball, brick)) {
+
                     brick.onHit();
                     score += brick.getScoreValue();
 
-                    if (brick.isToBeRemoved()) {
-                        soundManager.playSound("break");
-                        spawnPowerUp(brick.getPosition().x, brick.getPosition().y);
-                    } else {
+                    // Nếu bóng xuyên → không đổi hướng
+                    if (!ball.isPierce()) {
                         soundManager.playSound("hit");
+                    } else {
+                        soundManager.playSound("powerup"); // âm khác cho ngầu
                     }
+
+                    // Nếu gạch vỡ → spawn power-up
+                    if (brick.isToBeRemoved()) {
+                        spawnPowerUp(brick.getPosition().x, brick.getPosition().y);
+                    }
+
+                    // Chỉ bật lại hướng nếu KHÔNG xuyên
+                    if (!ball.isPierce()) {
+                        // giữ nguyên code đảo vận tốc cũ của bạn
+                    }
+
                     break;
                 }
             }
@@ -462,7 +477,7 @@ public class GameScene extends SceneManager {
     }
 
     private void spawnPowerUp(double x, double y) {
-        if (Math.random() < 0.3) {
+        if (Math.random() < 0.7) {
             PowerUp powerUp = PowerFactory.createRandomPowerUp(x, y);
             powerUp.start();
             powerUps.add(powerUp);
@@ -575,13 +590,23 @@ public class GameScene extends SceneManager {
                 powerupImage = ballImage; //DÙNG HÌNH BALL
             } else if (powerUp instanceof Entities.Power.PowerUpExtraLive) {
                 powerupImage = paddleImage;
+            } else if (powerUp instanceof Entities.Power.PowerUpPierceBall) {
+                powerupImage = pierceImage;
             }
+
 
 
             if (powerupImage != null) {
 
                 double width = 40;  // mặc định cho power-up khác
                 double height = 40;
+
+                // PierceBall → dùng kích thước nhỏ hơn
+                if (powerUp instanceof Entities.Power.PowerUpPierceBall) {
+                    width = 20;
+                    height = 20;
+                }
+
 
                 // Thu nhỏ MULTIBALL
                 if (powerUp instanceof Entities.Power.PowerUpMultiBall) {

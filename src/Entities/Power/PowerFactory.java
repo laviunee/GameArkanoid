@@ -24,7 +24,7 @@ public class PowerFactory {
     }
 
     public static PowerUp createRandomPowerUp(double x, double y) {
-        int type = random.nextInt(4);
+        int type = random.nextInt(5);
 
         switch (type) {
             case 0:
@@ -40,6 +40,8 @@ public class PowerFactory {
                 }
             case 3:
                 return new PowerUpExtraLive(x, y, gameScene);
+            case 4:
+                return new PowerUpPierceBall(x, y);
 
             default:
                 return null;
