@@ -260,7 +260,7 @@ public class GameScene extends SceneManager {
 
         // CĂN GIỮA TRONG VÙNG CHƠI
         double startX = Config.INSET + (playAreaWidth - totalWidth) / 2;
-        double startY = Config.UPPER_INSET + 30;
+        double startY = Config.UPPER_INSET + 60;
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
@@ -573,16 +573,16 @@ public class GameScene extends SceneManager {
     }
 
     private void drawUI() {
-        ctx.setFill(Color.WHITE);
+        ctx.setFill(Color.BLACK);
         ctx.fillText("SCORE: " + score, 20, 30);
         ctx.fillText("LIVES: " + lives, Config.SCREEN_WIDTH - 80, 30);
-        ctx.fillText("GAMEGr08 - ARKANOID", Config.SCREEN_WIDTH/2 - 60, 30);
+        ctx.fillText("LEVEL 1", Config.SCREEN_WIDTH/2 - 40, 40);
 
         String soundStatus = soundManager.isSoundEnabled() ? "ON" : "OFF";
         Color soundColor = soundManager.isSoundEnabled() ? Color.GREEN : Color.RED;
         ctx.setFill(soundColor);
         ctx.fillText("SOUND: " + soundStatus, Config.SCREEN_WIDTH - 120, 50);
-        ctx.setFill(Color.WHITE);
+        ctx.setFill(Color.BLACK);
         ctx.fillText("Press M to toggle", Config.SCREEN_WIDTH - 150, 65);
 
         // THÊM: Hiển thị hướng dẫn pause
