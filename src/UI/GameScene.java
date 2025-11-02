@@ -477,7 +477,7 @@ public class GameScene extends SceneManager {
     }
 
     private void spawnPowerUp(double x, double y) {
-        if (Math.random() < 0.7) {
+        if (Math.random() < 0.5) {
             PowerUp powerUp = PowerFactory.createRandomPowerUp(x, y);
             powerUp.start();
             powerUps.add(powerUp);

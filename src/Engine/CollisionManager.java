@@ -74,6 +74,12 @@ public class CollisionManager {
         double ballRadius = ball.getRadius();
 
         if (brick.collidesWith(ballX, ballY, ballRadius)) {
+
+            // ⚡ Nếu bóng xuyên phá, không đảo hướng
+            if (ball.isPierce()) {
+                System.out.println("PierceBall xuyên qua gạch!");
+                return true; // chỉ báo có va chạm
+            }
             // Xác định hướng va chạm để nảy đúng hướng
             double brickLeft = brick.getPosition().x;
             double brickRight = brick.getPosition().x + brick.getWidth();
