@@ -187,6 +187,7 @@ public class GameScene extends SceneManager {
         balls = new ArrayList<>();
         spawnBall();
         Entities.Power.PowerFactory.setBalls(balls);
+        Entities.Power.PowerFactory.setGameScene(this);
 
 
         bricks = new ArrayList<>();
@@ -572,15 +573,24 @@ public class GameScene extends SceneManager {
                 powerupImage = powerupFastballImage;
             } else if (powerUp instanceof Entities.Power.PowerUpMultiBall) {
                 powerupImage = ballImage; //DÙNG HÌNH BALL
+            } else if (powerUp instanceof Entities.Power.PowerUpExtraLive) {
+                powerupImage = paddleImage;
             }
 
+
             if (powerupImage != null) {
-                // VẼ SPRITE POWER-UP VỚI KÍCH THƯỚC 40x40
-                ctx.drawImage(powerupImage, x, y, size, size);
-            } else {
-                // FALLBACK VỚI KÍCH THƯỚC 40x40
-                drawPowerUpFallback(powerUp, x, y, size);
+
+                double width = 40;  // mặc định cho power-up khác
+                double height = 40;
+
+                // Riêng ExtraLife → thu nhỏ hơn
+                if (powerUp instanceof Entities.Power.PowerUpExtraLive) {
+                    width = paddleImage.getWidth() * 0.5;   // 50% kích thước paddle
+                    height = paddleImage.getHeight() * 0.5;
+                }
+                ctx.drawImage(powerupImage, x, y, width, height);
             }
+
         }
     }
 
@@ -687,6 +697,11 @@ public class GameScene extends SceneManager {
     }
 
     // === GETTERS ===
+    public void addLive() {
+        lives++;
+        System.out.println("Live added! Lives = " + lives);
+    }
+
     public boolean isRunning() { return isRunning; }
     public int getScore() { return score; }
     public int getLives() { return lives; }
