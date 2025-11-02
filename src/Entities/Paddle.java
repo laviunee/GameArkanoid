@@ -65,6 +65,46 @@ public class Paddle extends MovableObject {
         setVelocity(0, 0);
     }
 
+    // Mouse control methods
+    public void moveToMouse(double mouseX) {
+        // Di chuyển paddle đến vị trí chuột (theo trục X)
+        double newX = mouseX;
+
+        // Giới hạn vị trí để paddle không ra khỏi màn hình
+        if (newX < Config.INSET + width/2) {
+            newX = Config.INSET + width/2;
+        }
+        if (newX > Config.SCREEN_WIDTH - Config.INSET - width/2) {
+            newX = Config.SCREEN_WIDTH - Config.INSET - width/2;
+        }
+
+        // Đặt vị trí trực tiếp (không dùng velocity)
+        setPosition(newX, position.y);
+    }
+
+    public void followMouse(double mouseX, double deltaTime) {
+        // Di chuyển mượt mà đến vị trí chuột với tốc độ cố định
+        double targetX = mouseX;
+
+        // Giới hạn vị trí đích
+        if (targetX < Config.INSET + width/2) {
+            targetX = Config.INSET + width/2;
+        }
+        if (targetX > Config.SCREEN_WIDTH - Config.INSET - width/2) {
+            targetX = Config.SCREEN_WIDTH - Config.INSET - width/2;
+        }
+
+        // Tính toán hướng và tốc độ di chuyển
+        double direction = targetX - position.x;
+        double speed = Math.min(Math.abs(direction) / deltaTime, Config.PADDLE_SPEED * 2);
+
+        if (Math.abs(direction) > 1.0) { // Ngưỡng nhỏ để tránh rung
+            setVelocity(Math.signum(direction) * speed, 0);
+        } else {
+            stop(); // Dừng lại khi đã đến gần vị trí đích
+        }
+    }
+
     public double getWidth() {
         return width;
     }

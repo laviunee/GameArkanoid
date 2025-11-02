@@ -13,10 +13,12 @@ import Entities.Power.PowerFactory;
 import Utils.Config;
 import Utils.SoundManager;
 import Utils.SpriteLoader;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ import java.util.List;
 
 public class GameScene extends SceneManager {
     private GraphicsContext ctx;
+    private Canvas canvas;
     private SoundManager soundManager;
     private SpriteLoader spriteLoader;
 
@@ -41,6 +44,10 @@ public class GameScene extends SceneManager {
     private PauseScene pauseScene;
     private boolean isPaused = false;
 
+    // Mouse control
+    private boolean mouseControlEnabled = false;
+    private double mouseX = 0;
+
     // Sprite references
     private javafx.scene.image.Image gameBackground;
     private javafx.scene.image.Image paddleImage;
@@ -56,12 +63,76 @@ public class GameScene extends SceneManager {
 
     public GameScene(GraphicsContext ctx, GameEngine gameEngine) {
         this.ctx = ctx;
+        this.canvas = ctx.getCanvas();
         this.gameEngine = gameEngine;
         this.soundManager = SoundManager.getInstance();
         this.spriteLoader = SpriteLoader.getInstance();
         this.isRunning = true;
         this.pauseScene = null; //PauseScene sẽ được GameEngine quản lý
         loadGameSprites();
+        setupMouseControls();
+    }
+
+    // THÊM: Thiết lập điều khiển chuột
+    private void setupMouseControls() {
+        // Di chuyển paddle khi di chuột
+        canvas.setOnMouseMoved(this::handleMouseMoved);
+
+        // Di chuyển paddle khi kéo chuột
+        canvas.setOnMouseDragged(this::handleMouseDragged);
+
+        // Click để bật/tắt điều khiển chuột hoặc launch ball
+        canvas.setOnMouseClicked(this::handleMouseClicked);
+
+        // Theo dõi khi chuột rời khỏi canvas
+        canvas.setOnMouseExited(this::handleMouseExited);
+    }
+
+    // THÊM: Xử lý sự kiện chuột
+    private void handleMouseMoved(MouseEvent event) {
+        if (!isRunning || isPaused) return;
+
+        mouseX = event.getX();
+        if (mouseControlEnabled) {
+            paddle.moveToMouse(mouseX);
+        }
+    }
+
+    private void handleMouseDragged(MouseEvent event) {
+        if (!isRunning || isPaused) return;
+
+        mouseX = event.getX();
+        paddle.moveToMouse(mouseX);
+    }
+
+    private void handleMouseClicked(MouseEvent event) {
+        if (!isRunning || isPaused) return;
+
+        // Click trái để launch ball
+        if (event.isPrimaryButtonDown()) {
+            launchBall();
+        }
+
+        // Click phải để bật/tắt điều khiển chuột
+        if (event.isSecondaryButtonDown()) {
+            toggleMouseControl();
+        }
+    }
+
+    private void handleMouseExited(MouseEvent event) {
+        // Dừng paddle khi chuột rời khỏi canvas
+        if (!isRunning || isPaused) return;
+        paddle.stop();
+    }
+
+    // THÊM: Bật/tắt điều khiển chuột
+    private void toggleMouseControl() {
+        mouseControlEnabled = !mouseControlEnabled;
+        System.out.println("Mouse control: " + (mouseControlEnabled ? "ENABLED" : "DISABLED"));
+
+        if (!mouseControlEnabled) {
+            paddle.stop();
+        }
     }
 
     // THÊM: Method để resume game từ pause
@@ -127,6 +198,7 @@ public class GameScene extends SceneManager {
 
         isRunning = true;
         isPaused = false; // Đảm bảo không pause khi bắt đầu
+        mouseControlEnabled = false; // Reset điều khiển chuột
     }
 
     @Override
@@ -134,7 +206,12 @@ public class GameScene extends SceneManager {
         // Không update nếu game đang pause
         if (!isRunning || isPaused) return;
 
-        paddle.update(deltaTime);
+        // Nếu điều khiển chuột được bật, cập nhật vị trí paddle
+        if (mouseControlEnabled) {
+            paddle.moveToMouse(mouseX);
+        } else {
+            paddle.update(deltaTime);
+        }
 
         for (Ball ball : balls) {
             if (ball.isOnPaddle()) {
@@ -177,14 +254,19 @@ public class GameScene extends SceneManager {
     public void handleInput(KeyEvent event) {
         if (event.getEventType() == KeyEvent.KEY_PRESSED) {
             switch (event.getCode()) {
-                case LEFT, A -> movePaddleLeft();
-                case RIGHT, D -> movePaddleRight();
+                case LEFT, A -> {
+                    if (!mouseControlEnabled) movePaddleLeft();
+                }
+                case RIGHT, D -> {
+                    if (!mouseControlEnabled) movePaddleRight();
+                }
                 case SPACE -> launchBall();
                 case M -> {
                     boolean currentState = soundManager.isSoundEnabled();
                     soundManager.setSoundEnabled(!currentState);
                     System.out.println("Sound toggled from " + currentState + " to " + soundManager.isSoundEnabled());
                 }
+                case C -> toggleMouseControl(); // THÊM: Phím C để bật/tắt điều khiển chuột
                 // Gọi GameEngine để pause
                 case P, ESCAPE -> {
                     if (!isPaused) {
@@ -197,7 +279,9 @@ public class GameScene extends SceneManager {
 
         if (event.getEventType() == KeyEvent.KEY_RELEASED) {
             switch (event.getCode()) {
-                case LEFT, RIGHT, A, D -> stopPaddle();
+                case LEFT, RIGHT, A, D -> {
+                    if (!mouseControlEnabled) stopPaddle();
+                }
             }
         }
     }
@@ -228,6 +312,12 @@ public class GameScene extends SceneManager {
         bricks.clear();
         powerUps.clear();
         isPaused = false; // Đảm bảo reset trạng thái pause
+
+        // THÊM: Remove mouse event handlers để tránh memory leak
+        canvas.setOnMouseMoved(null);
+        canvas.setOnMouseDragged(null);
+        canvas.setOnMouseClicked(null);
+        canvas.setOnMouseExited(null);
     }
 
     // === CÁC METHOD GAME LOGIC ===
@@ -380,9 +470,18 @@ public class GameScene extends SceneManager {
     }
 
     // === INPUT METHODS ===
-    public void movePaddleLeft() { paddle.moveLeft(); }
-    public void movePaddleRight() { paddle.moveRight(); }
-    public void stopPaddle() { paddle.stop(); }
+    public void movePaddleLeft() {
+        if (!mouseControlEnabled) paddle.moveLeft();
+    }
+
+    public void movePaddleRight() {
+        if (!mouseControlEnabled) paddle.moveRight();
+    }
+
+    public void stopPaddle() {
+        if (!mouseControlEnabled) paddle.stop();
+    }
+
     public void launchBall() {
         if (!balls.isEmpty() && balls.get(0).isOnPaddle()) {
             Ball ball = balls.get(0);
@@ -556,6 +655,14 @@ public class GameScene extends SceneManager {
         ctx.setFill(Color.BLACK);
         ctx.fillText("Press M to toggle", Config.SCREEN_WIDTH - 150, 65);
 
+        // THÊM: Hiển thị trạng thái điều khiển chuột
+        String mouseControlStatus = mouseControlEnabled ? "MOUSE CONTROL: ON" : "MOUSE CONTROL: OFF";
+        Color mouseColor = mouseControlEnabled ? Color.GREEN : Color.YELLOW;
+        ctx.setFill(mouseColor);
+        ctx.fillText(mouseControlStatus, Config.SCREEN_WIDTH/2 - 70, 60);
+        ctx.setFill(Color.BLACK);
+        ctx.fillText("Press C to toggle / Right-click", Config.SCREEN_WIDTH/2 - 80, 75);
+
         // THÊM: Hiển thị hướng dẫn pause
         ctx.setFill(Color.YELLOW);
         ctx.fillText("Press P or ESC to pause", Config.SCREEN_WIDTH/2 - 70, Config.SCREEN_HEIGHT - 20);
@@ -584,4 +691,5 @@ public class GameScene extends SceneManager {
     public int getScore() { return score; }
     public int getLives() { return lives; }
     public boolean isPaused() { return isPaused; }
+    public boolean isMouseControlEnabled() { return mouseControlEnabled; }
 }
