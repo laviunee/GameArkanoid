@@ -701,20 +701,6 @@ public class GameScene extends SceneManager {
         Color mouseColor = mouseControlEnabled ? Color.GREEN : Color.YELLOW;
         ctx.setFill(mouseColor);
         ctx.fillText(mouseControlStatus, Config.SCREEN_WIDTH/2 - 70, 60);
-        ctx.setFill(Color.BLACK);
-        ctx.fillText("Press C to toggle / Right-click", Config.SCREEN_WIDTH/2 - 80, 75);
-
-        // THÊM: Hiển thị hướng dẫn pause
-        ctx.setFill(Color.YELLOW);
-        ctx.fillText("Press P or ESC to pause", Config.SCREEN_WIDTH/2 - 70, Config.SCREEN_HEIGHT - 20);
-
-        long activeBalls = balls.stream().filter(Ball::isActive).count();
-        if (activeBalls == 0 && lives > 0) {
-            ctx.setFill(Color.YELLOW);
-            ctx.fillText("PRESS SPACE TO LAUNCH BALL", Config.SCREEN_WIDTH/2 - 90, Config.SCREEN_HEIGHT - 40);
-            ctx.setFill(Color.WHITE);
-            ctx.fillText("Lives remaining: " + lives, Config.SCREEN_WIDTH/2 - 50, Config.SCREEN_HEIGHT - 60);
-        }
 
         if (lives <= 0) {
             ctx.setFill(Color.RED);

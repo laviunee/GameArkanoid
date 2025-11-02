@@ -8,6 +8,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+
+import java.io.InputStream;
 
 public class MenuScene extends SceneManager {
     private GraphicsContext ctx;
@@ -18,28 +21,29 @@ public class MenuScene extends SceneManager {
     // Menu state
     private boolean isActive;
     private int selectedOption;
-    private final String[] mainOptions = {"START GAME", "OPTIONS", "CREDITS", "EXIT"};
+    private final String[] mainOptions = {"START GAME", "INSTRUCTION", "CREDITS", "EXIT"};
     private MenuState currentState;
     private long lastInputTime;
 
-    // UI elements
+    // UI elements - CHỈ TITLE LOAD FONT TỪ FILE
     private Font titleFont;
     private Font optionFont;
     private Font infoFont;
+    private Font creditsFont;
 
     // Animation
     private double titleYOffset;
     private double titlePulse;
     private long lastUpdateTime;
 
-    // CHỈ 2 sprite này trước
+    // Sprites
     private javafx.scene.image.Image menuBackground;
     private javafx.scene.image.Image titleImage;
 
     // Menu states
     private enum MenuState {
         MAIN_MENU,
-        OPTIONS,
+        INSTRUCTION,
         CREDITS
     }
 
@@ -49,10 +53,7 @@ public class MenuScene extends SceneManager {
         this.spriteLoader = SpriteLoader.getInstance();
         this.onStartGame = onStartGame;
 
-        // Initialize fonts
-        this.titleFont = Font.font("Arial", 48);
-        this.optionFont = Font.font("Arial", 32);
-        this.infoFont = Font.font("Arial", 16);
+        loadFontsFromResources();
 
         // Initialize state
         this.currentState = MenuState.MAIN_MENU;
@@ -60,16 +61,54 @@ public class MenuScene extends SceneManager {
         this.lastInputTime = System.currentTimeMillis();
         this.lastUpdateTime = System.currentTimeMillis();
 
-        // CHỈ load 2 ảnh này trước
         loadMenuSprites();
+    }
+
+    private void loadFontsFromResources() {
+        try {
+            // 🎯 CHỈ LOAD TITLE FONT TỪ FILE
+            InputStream titleFontStream = getClass().getResourceAsStream("/fonts/Title.ttf");
+            if (titleFontStream != null) {
+                titleFont = Font.loadFont(titleFontStream, 80);
+                titleFontStream.close();
+                System.out.println("✅ Menu title font loaded successfully");
+            } else {
+                System.err.println("❌ Title font not found, using fallback");
+                titleFont = Font.font("Impact", FontWeight.BOLD, 80);
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ Error loading menu fonts: " + e.getMessage());
+            setFallbackFonts();
+        }
+
+        // 🎯 CÁC FONT KHÁC DÙNG HỆ THỐNG
+        setSystemFonts();
+    }
+
+    private void setSystemFonts() {
+        // 🎯 OPTION FONT - DÙNG FONT HỆ THỐNG
+        optionFont = Font.font("Arial", FontWeight.BOLD, 35);
+
+        // 🎯 INFO FONT - DÙNG FONT HỆ THỐNG
+        infoFont = Font.font("Courier New", FontWeight.BOLD, 15);
+
+        // 🎯 CREDITS FONT - DÙNG FONT HỆ THỐNG
+        creditsFont = Font.font("Courier New", FontWeight.BOLD, 20);
+    }
+
+    private void setFallbackFonts() {
+        titleFont = Font.font("Impact", FontWeight.BOLD, 80);
+        optionFont = Font.font("Arial", FontWeight.BOLD, 28);
+        infoFont = Font.font("Courier New", FontWeight.NORMAL, 18);
+        creditsFont = Font.font("Verdana", FontWeight.NORMAL, 20);
     }
 
     private void loadMenuSprites() {
         try {
-            // THỬ các đường dẫn khác nhau
             String[] bgPaths = {
                     "/images/backgrounds/menu.png",
-                    "/assets/images/backgrounds/menu.png",
+                    "/images/backgrounds/menu.png",
                     "images/backgrounds/menu.png"
             };
 
@@ -80,7 +119,6 @@ public class MenuScene extends SceneManager {
                     break;
                 }
             }
-
 
         } catch (Exception e) {
             System.err.println("Error loading menu sprites: " + e.getMessage());
@@ -105,14 +143,13 @@ public class MenuScene extends SceneManager {
     @Override
     public void render() {
         clearScreen();
-        drawBackground(); // QUAN TRỌNG: vẽ background có image
+        drawBackground();
 
         switch (currentState) {
             case MAIN_MENU -> drawMainMenu();
-            case OPTIONS -> drawOptionsMenu();
+            case INSTRUCTION -> drawInstructionScreen();
             case CREDITS -> drawCreditsScreen();
         }
-
     }
 
     private void clearScreen() {
@@ -121,12 +158,8 @@ public class MenuScene extends SceneManager {
 
     private void drawBackground() {
         if (menuBackground != null && !menuBackground.isError()) {
-            // Vẽ background image nếu load được
             ctx.drawImage(menuBackground, 0, 0, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
-            System.out.println("🎨 Drawing menu background image");
         } else {
-            // Fallback: vẽ background
-            System.out.println("🎨 Using fallback background");
             for (int i = 0; i < Config.SCREEN_HEIGHT; i += 2) {
                 double progress = (double) i / Config.SCREEN_HEIGHT;
                 Color color = Color.hsb(240, 0.8, 0.2 + progress * 0.3);
@@ -134,7 +167,6 @@ public class MenuScene extends SceneManager {
                 ctx.fillRect(0, i, Config.SCREEN_WIDTH, 2);
             }
 
-            // Stars
             ctx.setFill(Color.WHITE);
             for (int i = 0; i < 50; i++) {
                 double x = (i * 73) % Config.SCREEN_WIDTH;
@@ -146,58 +178,92 @@ public class MenuScene extends SceneManager {
     }
 
     private void drawMainMenu() {
-        drawTitle(); // Vẽ title có image
+        drawTitle();
         drawMainMenuOptions();
         drawInstructions();
     }
 
     private void drawTitle() {
         if (titleImage != null && !titleImage.isError()) {
-            // Vẽ title image
             double pulse = Math.sin(titlePulse) * 5;
             double x = Config.SCREEN_WIDTH / 2 - titleImage.getWidth() / 2;
             double y = 100 + titleYOffset + pulse;
             ctx.drawImage(titleImage, x, y);
-        } /*else {
-            // Fallback: vẽ title bằng text
+        } else {
             double pulse = Math.sin(titlePulse) * 5;
-            ctx.setFont(titleFont);
-            ctx.setFill(Color.CYAN);
-            ctx.fillText("By Group 08",
-                    Config.SCREEN_WIDTH / 2 - 140,
-                    150 + titleYOffset + pulse);
 
-            ctx.setFont(Font.font("Arial", 24));
-            ctx.setFill(Color.YELLOW);
-            ctx.fillText("ARKANOID",
-                    Config.SCREEN_WIDTH / 2 - 130,
-                    200 + titleYOffset + pulse);
-        }*/
+            // 🎯 TITLE DÙNG FONT LOAD TỪ FILE
+            ctx.setFont(titleFont);
+            ctx.setFill(Color.PLUM); // tím
+            ctx.setStroke(Color.WHITE);
+            ctx.setLineWidth(3);
+            ctx.strokeText("ARKANOID", Config.SCREEN_WIDTH / 2 - 185, 125 + titleYOffset + pulse);
+            ctx.fillText("ARKANOID", Config.SCREEN_WIDTH / 2 - 185, 125 + titleYOffset + pulse);
+        }
     }
 
     private void drawMainMenuOptions() {
+        // 🎯 OPTIONS DÙNG FONT HỆ THỐNG
         ctx.setFont(optionFont);
         String[] options = getCurrentOptions();
 
         for (int i = 0; i < options.length; i++) {
             if (i == selectedOption) {
                 ctx.setFill(Color.YELLOW);
-                ctx.fillText("> " + options[i] + " <",
-                        Config.SCREEN_WIDTH / 2 - 100,
-                        450 + i * 60);
+                ctx.setStroke(Color.ORANGE);
+                ctx.setLineWidth(2);
+                ctx.strokeText("➤ " + options[i], Config.SCREEN_WIDTH / 2 - 150, 420 + i * 60);
+                ctx.fillText("➤ " + options[i], Config.SCREEN_WIDTH / 2 - 150, 420 + i * 60);
             } else {
                 ctx.setFill(Color.WHITE);
-                ctx.fillText(options[i],
-                        Config.SCREEN_WIDTH / 2 - 80,
-                        450 + i * 60);
+                ctx.fillText(options[i], Config.SCREEN_WIDTH / 2 - 120, 420 + i * 60);
             }
         }
     }
 
-    private void drawOptionsMenu() {
+    private void drawInstructionScreen() {
         drawTitle();
-        drawOptions();
-        drawOptionsInstructions();
+        drawInstructionContent();
+        drawHowToPlayInstructions();
+    }
+
+    private void drawInstructionContent() {
+        // 🎯 INSTRUCTION TITLE DÙNG FONT HỆ THỐNG
+        ctx.setFont(optionFont);
+        ctx.setFill(Color.YELLOW);
+        ctx.setStroke(Color.ORANGE);
+        ctx.setLineWidth(2);
+        ctx.strokeText("HOW TO PLAY", Config.SCREEN_WIDTH / 2 - 140, 370);
+        ctx.fillText("HOW TO PLAY", Config.SCREEN_WIDTH / 2 - 140, 370);
+
+        // 🎯 INSTRUCTION CONTENT DÙNG FONT HỆ THỐNG
+        ctx.setFont(infoFont);
+        ctx.setFill(Color.WHITE);
+
+        String[] instructions = {
+                "CONTROLS:",
+                "← → OR A/D OR MOUSE ⮕ Move Paddle",
+                "SPACE ⮕ Launch Ball",
+                "P OR ESC ⮕ Pause Game",
+                "M ⮕ Toggle Sound",
+                "C ⮕ Toggle Mouse",
+                "",
+                "GAME OBJECTIVE:",
+                "BREAK ALL BRICKS WITH BALL",
+                "DON'T LET BALL FALL DOWN",
+                "COLLECT POWER-UPS FOR BONUSES"
+        };
+
+        for (int i = 0; i < instructions.length; i++) {
+            ctx.fillText(instructions[i], Config.SCREEN_WIDTH / 2 - 200, 420 + i * 25);
+        }
+    }
+
+    private void drawHowToPlayInstructions() {
+        // 🎯 INSTRUCTIONS DÙNG FONT HỆ THỐNG
+        ctx.setFont(infoFont);
+        ctx.setFill(Color.LIGHTGRAY);
+        ctx.fillText("PRESS ENTER TO RETURN", Config.SCREEN_WIDTH / 2 - 120, 700);
     }
 
     private void drawCreditsScreen() {
@@ -206,59 +272,48 @@ public class MenuScene extends SceneManager {
         drawCreditsInstructions();
     }
 
-    private void drawOptions() {
-        ctx.setFont(optionFont);
-        ctx.setFill(Color.YELLOW);
-        ctx.fillText("OPTIONS", Config.SCREEN_WIDTH / 2 - 70, 420);
-
-        ctx.setFont(infoFont);
-        if (selectedOption == 0) {
-            ctx.setFill(Color.YELLOW);
-            ctx.fillText("> SOUND: " + (soundManager.isSoundEnabled() ? "ON" : "OFF") + " <",
-                    Config.SCREEN_WIDTH / 2 - 65, 480);
-        } else {
-            ctx.setFill(Color.WHITE);
-            ctx.fillText("SOUND: " + (soundManager.isSoundEnabled() ? "ON" : "OFF"),
-                    Config.SCREEN_WIDTH / 2 - 45, 480);
-        }
-    }
-
     private void drawCredits() {
+        // 🎯 CREDITS TITLE DÙNG FONT HỆ THỐNG
         ctx.setFont(optionFont);
         ctx.setFill(Color.YELLOW);
-        ctx.fillText("CREDITS", Config.SCREEN_WIDTH / 2 - 80, 450);
+        ctx.setStroke(Color.ORANGE);
+        ctx.setLineWidth(2);
+        ctx.strokeText("CREDITS", Config.SCREEN_WIDTH / 2 - 60, 400);
+        ctx.fillText("CREDITS", Config.SCREEN_WIDTH / 2 - 60, 400);
 
-        ctx.setFont(infoFont);
+        // 🎯 CREDITS CONTENT DÙNG FONT HỆ THỐNG
+        ctx.setFont(creditsFont);
         ctx.setFill(Color.WHITE);
-        String[] credits = {"GAME DEVELOPED BY: Group 8"};
+        String[] credits = {
+                "GAME DEVELOPED BY:",
+                "GROUP 08",
+                "",
+                "TEAM MEMBERS:",
+                "Vũ Thị Lâm Anh",
+                "Nguyễn Minh Thư",
+                "Nguyễn Thị Chung"
+        };
+
         for (int i = 0; i < credits.length; i++) {
-            ctx.fillText(credits[i], Config.SCREEN_WIDTH / 2 - 130, 500 + i * 25);
+            ctx.fillText(credits[i], Config.SCREEN_WIDTH / 2 - 100, 450 + i * 30);
         }
     }
 
     private void drawInstructions() {
+        // 🎯 MAIN MENU INSTRUCTIONS DÙNG FONT HỆ THỐNG
         ctx.setFont(infoFont);
         ctx.setFill(Color.LIGHTGRAY);
-        ctx.fillText("USE ↑↓ OR W/S TO NAVIGATE", Config.SCREEN_WIDTH / 2 - 120, 665);
-        ctx.fillText("PRESS ENTER TO SELECT", Config.SCREEN_WIDTH / 2 - 120, 695);
-        ctx.fillText("PRESS M TO TOGGLE SOUND", Config.SCREEN_WIDTH / 2 - 120, 725);
-    }
-
-    private void drawOptionsInstructions() {
-        ctx.setFont(infoFont);
-        ctx.setFill(Color.WHITE);
-        ctx.fillText("USE ↑↓ TO SELECT OPTION", Config.SCREEN_WIDTH / 2 - 100, 550);
-        ctx.fillText("USE ←→ TO ADJUST VALUE", Config.SCREEN_WIDTH / 2 - 100, 580);
-        ctx.fillText("PRESS ENTER TO APPLY", Config.SCREEN_WIDTH / 2 - 80, 610);
-        ctx.fillText("PRESS ESC TO CANCEL", Config.SCREEN_WIDTH / 2 - 80, 640);
+        ctx.fillText("USE ↑↓ OR W/S TO NAVIGATE", Config.SCREEN_WIDTH / 2 - 120, 650);
+        ctx.fillText("PRESS ENTER TO SELECT", Config.SCREEN_WIDTH / 2 - 120, 680);
+        ctx.fillText("PRESS M TO TOGGLE SOUND", Config.SCREEN_WIDTH / 2 - 120, 710);
     }
 
     private void drawCreditsInstructions() {
+        // 🎯 CREDITS INSTRUCTIONS DÙNG FONT HỆ THỐNG
         ctx.setFont(infoFont);
-        ctx.setFill(Color.WHITE);
-        ctx.fillText("PRESS ANY KEY TO RETURN", Config.SCREEN_WIDTH / 2 - 115, 600);
+        ctx.setFill(Color.LIGHTGRAY);
+        ctx.fillText("PRESS ENTER TO RETURN", Config.SCREEN_WIDTH / 2 - 120, 700);
     }
-
 
     private void updateAnimations(double deltaTime) {
         long currentTime = System.currentTimeMillis();
@@ -267,7 +322,6 @@ public class MenuScene extends SceneManager {
         lastUpdateTime = currentTime;
     }
 
-    // Input handling giữ nguyên
     @Override
     public void handleInput(KeyEvent event) {
         if (!isActive) return;
@@ -283,7 +337,7 @@ public class MenuScene extends SceneManager {
     private void handleKeyPress(KeyEvent event) {
         switch (currentState) {
             case MAIN_MENU -> handleMainMenuInput(event);
-            case OPTIONS -> handleOptionsInput(event);
+            case INSTRUCTION -> handleInstructionInput(event);
             case CREDITS -> handleCreditsInput(event);
         }
     }
@@ -298,14 +352,9 @@ public class MenuScene extends SceneManager {
         }
     }
 
-    private void handleOptionsInput(KeyEvent event) {
+    private void handleInstructionInput(KeyEvent event) {
         switch (event.getCode()) {
-            case UP, W -> moveSelectionUp();
-            case DOWN, S -> moveSelectionDown();
-            case LEFT, A -> adjustOption(-1);
-            case RIGHT, D -> adjustOption(1);
-            case ENTER, SPACE -> applyOptions();
-            case ESCAPE -> returnToMainMenu();
+            case ENTER, SPACE, ESCAPE -> returnToMainMenu();
         }
     }
 
@@ -326,7 +375,7 @@ public class MenuScene extends SceneManager {
     private void selectMainMenuOption() {
         switch (selectedOption) {
             case 0 -> startGame();
-            case 1 -> showOptions();
+            case 1 -> showInstruction();
             case 2 -> showCredits();
             case 3 -> exitGame();
         }
@@ -338,9 +387,8 @@ public class MenuScene extends SceneManager {
         }
     }
 
-    private void showOptions() {
-        currentState = MenuState.OPTIONS;
-        selectedOption = 0;
+    private void showInstruction() {
+        currentState = MenuState.INSTRUCTION;
     }
 
     private void showCredits() {
@@ -352,38 +400,18 @@ public class MenuScene extends SceneManager {
         selectedOption = 0;
     }
 
-    private void applyOptions() {
-        returnToMainMenu();
-    }
-
-    private void adjustOption(int direction) {
-        // Chỉ xử lý khi đang chọn mục SOUND
-        if (currentState == MenuState.OPTIONS && selectedOption == 0) {
-            boolean current = soundManager.isSoundEnabled();
-            soundManager.setSoundEnabled(!current);
-        }
-    }
-
-
     private void toggleSound() {
         boolean newState = !soundManager.isSoundEnabled();
         soundManager.setSoundEnabled(newState);
-
-        //ép vẽ lại menu để cập nhật dòng "SOUND: ON/OFF"
         render();
     }
-
 
     private void exitGame() {
         System.exit(0);
     }
 
     private String[] getCurrentOptions() {
-        switch (currentState) {
-            case MAIN_MENU: return mainOptions;
-            case OPTIONS: return new String[]{"SOUND", "MUSIC", "CONTROLS", "BACK"};
-            default: return mainOptions;
-        }
+        return mainOptions;
     }
 
     @Override
