@@ -583,7 +583,13 @@ public class GameScene extends SceneManager {
                 double width = 40;  // mặc định cho power-up khác
                 double height = 40;
 
-                // Riêng ExtraLife → thu nhỏ hơn
+                // Thu nhỏ MULTIBALL
+                if (powerUp instanceof Entities.Power.PowerUpMultiBall) {
+                    width = 20;   // chỉnh tùy ý: 18 ~ 26 rất đẹp
+                    height = 20;
+                }
+
+                // ExtraLive → thu nhỏ hơn
                 if (powerUp instanceof Entities.Power.PowerUpExtraLive) {
                     width = paddleImage.getWidth() * 0.5;   // 50% kích thước paddle
                     height = paddleImage.getHeight() * 0.5;
