@@ -154,11 +154,13 @@ public class GameScene extends SceneManager {
 
         if (bricks.isEmpty()) {
             System.out.println("YOU WIN!");
+            soundManager.onGameWin();
             isRunning = false;
         }
 
         if (lives <= 0) {
             System.out.println("GAME OVER!");
+            soundManager.onGameOver();
             isRunning = false;
         }
     }

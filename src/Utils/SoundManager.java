@@ -134,7 +134,7 @@ public class SoundManager {
         if (audioClip != null) {
             try {
                 audioClip.play();
-                System.out.println("🔊 Playing sound: " + soundName);
+                System.out.println("Playing sound: " + soundName);
             } catch (Exception e) {
                 System.err.println("Error playing " + soundName + ": " + e.getMessage());
             }
@@ -149,7 +149,7 @@ public class SoundManager {
             // Dừng background music nếu đang phát
             stopBackgroundMusic();
             menuMusic.play();
-            System.out.println("🏠 Menu music started");
+            System.out.println("Menu music started");
         } catch (Exception e) {
             System.err.println("Lỗi starting menu music: " + e.getMessage());
         }
@@ -170,7 +170,7 @@ public class SoundManager {
             // Dừng menu music nếu đang phát
             stopMenuMusic();
             backgroundMusic.play();
-            System.out.println("🎮 Background music started");
+            System.out.println("Background music started");
         } catch (Exception e) {
             System.err.println("Lỗi starting background music: " + e.getMessage());
         }
