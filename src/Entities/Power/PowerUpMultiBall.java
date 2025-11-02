@@ -28,16 +28,20 @@ public class PowerUpMultiBall extends PowerUp {
         for (Ball original : balls) {
             Ball clone = new Ball(original.getPosition().x, original.getPosition().y);
 
-            // Tạo hướng bay lệch nhẹ
-            double angleOffset = (Math.random() * 0.6 - 0.3); // ~ ±17°
-            double vx = original.getVelocity().x;
-            double vy = original.getVelocity().y;
+            if (original.isOnPaddle()) {
+                clone.setActive(false);
+            } else {
+                // Tạo hướng bay lệch nhẹ
+                double angleOffset = (Math.random() * 0.6 - 0.3); // ~ ±17°
+                double vx = original.getVelocity().x;
+                double vy = original.getVelocity().y;
 
-            double newVx = vx * Math.cos(angleOffset) - vy * Math.sin(angleOffset);
-            double newVy = vx * Math.sin(angleOffset) + vy * Math.cos(angleOffset);
+                double newVx = vx * Math.cos(angleOffset) - vy * Math.sin(angleOffset);
+                double newVy = vx * Math.sin(angleOffset) + vy * Math.cos(angleOffset);
 
-            clone.setVelocity(newVx, newVy);
-            clone.setActive(true);
+                clone.setVelocity(newVx, newVy);
+                clone.setActive(true);
+            }
             newBalls.add(clone);
         }
 

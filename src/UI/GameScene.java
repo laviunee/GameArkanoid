@@ -384,13 +384,39 @@ public class GameScene extends SceneManager {
     public void movePaddleRight() { paddle.moveRight(); }
     public void stopPaddle() { paddle.stop(); }
     public void launchBall() {
-        if (!balls.isEmpty() && balls.get(0).isOnPaddle()) {
-            Ball ball = balls.get(0);
-            ball.setActive(true);
-            ball.setVelocity(0, -Config.BALL_SPEED);
-            System.out.println("Ball launched from paddle!");
+        if (balls == null || balls.isEmpty()) return;
+
+        // Tìm những quả còn ở trên paddle
+        List<Ball> onPaddleBalls = new ArrayList<>();
+        for (Ball b : balls) {
+            if (b.isOnPaddle()) onPaddleBalls.add(b);
         }
+
+        if (onPaddleBalls.isEmpty()) return;
+
+        // Nếu có nhiều quả trên paddle, cho chúng bay với một chút offset ngang để tách quỹ đạo
+        double baseSpeed = Config.BALL_SPEED;
+        int n = onPaddleBalls.size();
+
+        for (int i = 0; i < n; i++) {
+            Ball b = onPaddleBalls.get(i);
+
+            // bật active
+            b.setActive(true);
+
+            // tính offset ngang tùy thứ tự (ví dụ - (n-1)/2 ... + (n-1)/2) với bước nhỏ
+            double step = 40.0; // px để tách vị trí trước khi launch — điều chỉnh nếu cần
+            double offsetIndex = i - (n - 1) / 2.0;
+            double vx = offsetIndex * 40.0; // thay đổi lực ngang ban đầu (tỉ lệ với offsetIndex)
+            double vy = -baseSpeed;
+
+            // Nếu Ball có setVelocity, dùng nó. Nếu bạn muốn độ nhanh ngang nhỏ hơn, giảm vx.
+            b.setVelocity(vx, vy);
+        }
+
+        System.out.println("Launched " + n + " ball(s) from paddle!");
     }
+
 
     // === RENDER METHODS VỚI HÌNH ẢNH ===
     private void drawBackground() {
