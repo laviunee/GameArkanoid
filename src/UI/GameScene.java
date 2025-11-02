@@ -109,6 +109,7 @@ public class GameScene extends SceneManager {
 
     @Override
     public void start() {
+        soundManager.onGameStart();
         double paddleX = Config.SCREEN_WIDTH / 2;
         double paddleY = Config.SCREEN_HEIGHT - Config.PADDLE_OFFSET_Y;
         paddle = new Paddle(paddleX, paddleY);
