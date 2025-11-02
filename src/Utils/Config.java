@@ -4,11 +4,11 @@ public class Config {
     // Kích thước màn hình
     public static final double SCREEN_WIDTH = 560;
     public static final double SCREEN_HEIGHT = 740;
-    public static final double INSET = 22;
-    public static final double UPPER_INSET = 85;
+    public static final double INSET = 5;
+    public static final double UPPER_INSET = 75;
 
     // Vật lý game
-    public static final double BALL_SPEED = 350.0;
+    public static final double BALL_SPEED = 400.0;
     public static final double PADDLE_SPEED = 400.0;
     public static final double BONUS_BLOCK_SPEED = 70.0;
 
