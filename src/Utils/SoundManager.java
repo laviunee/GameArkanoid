@@ -14,12 +14,14 @@ public class SoundManager {
     private MediaPlayer backgroundMusic; // ← NHẠC GAME
     private boolean soundEnabled = true;
     private boolean initialized = false;
+    private boolean inGame = false;
     private double soundVolume = 0.7;
     private double musicVolume = 0.5;
 
     private SoundManager() {
         soundEffects = new HashMap<>();
     }
+
 
     public static SoundManager getInstance() {
         if (instance == null) {
@@ -186,6 +188,7 @@ public class SoundManager {
     // ← GAME EVENT METHODS
     public void onGameStart() {
         System.out.println("Game starting...");
+        inGame = true;
         stopAllSounds();           // Dừng toàn bộ âm thanh trước đó
         if (soundEnabled && initialized) {
             playSound("game_start");   // Phát hiệu ứng bắt đầu
@@ -196,6 +199,7 @@ public class SoundManager {
 
     public void onGameOver() {
         System.out.println("Game over...");
+        inGame = false;
         stopBackgroundMusic();
         stopMenuMusic();
         if (soundEnabled && initialized) {
@@ -210,6 +214,7 @@ public class SoundManager {
 
     public void onGameWin() {
         System.out.println("Game win!");
+        inGame = false;
         stopBackgroundMusic();
         stopMenuMusic();
         if (soundEnabled && initialized) {
@@ -224,8 +229,12 @@ public class SoundManager {
 
     public void onReturnToMenu() {
         System.out.println("Returning to menu...");
+        inGame = false;
         stopBackgroundMusic();     // Dừng nhạc game
         playMenuMusic();           // Phát nhạc menu
+        if (soundEnabled && initialized) {
+            playMenuMusic();
+        }
     }
 
     // ==================== GETTERS/SETTERS ====================
@@ -242,10 +251,19 @@ public class SoundManager {
             System.out.println("Sound disabled");
         } else {
             System.out.println("Sound enabled");
-            playMenuMusic(); // bật lại nhạc menu
+            // Phát lại loại nhạc phù hợp với trạng thái hiện tại
+            if (inGame) {
+                if (backgroundMusic != null) {
+                    playBackgroundMusic();
+                } else {
+                    // fallback: nếu background không có, play menu
+                    playMenuMusic();
+                }
+            } else {
+                playMenuMusic();
+            }
         }
     }
-
 
     public void toggleSound() {
         setSoundEnabled(!soundEnabled);
