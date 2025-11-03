@@ -5,6 +5,7 @@ import Utils.Config;
 import Utils.SoundManager;
 import Utils.SpriteLoader;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -17,11 +18,12 @@ public class MenuScene extends SceneManager {
     private SoundManager soundManager;
     private SpriteLoader spriteLoader;
     private Runnable onStartGame;
+    private Runnable onHighscoreSelected;
 
     // Menu state
     private boolean isActive;
     private int selectedOption;
-    private final String[] mainOptions = {"START GAME", "INSTRUCTION", "CREDITS", "EXIT"};
+    private final String[] mainOptions = {"START GAME", "INSTRUCTION", "CREDITS", "HIGHSCORE" , "EXIT"};
     private MenuState currentState;
     private long lastInputTime;
 
@@ -47,11 +49,12 @@ public class MenuScene extends SceneManager {
         CREDITS
     }
 
-    public MenuScene(GraphicsContext ctx, Runnable onStartGame) {
+    public MenuScene(GraphicsContext ctx, Runnable onStartGame, Runnable onHighscoreSelected) {
         this.ctx = ctx;
         this.soundManager = SoundManager.getInstance();
         this.spriteLoader = SpriteLoader.getInstance();
         this.onStartGame = onStartGame;
+        this.onHighscoreSelected = onHighscoreSelected;
 
         loadFontsFromResources();
 
@@ -150,6 +153,11 @@ public class MenuScene extends SceneManager {
             case INSTRUCTION -> drawInstructionScreen();
             case CREDITS -> drawCreditsScreen();
         }
+        // Hiển thị hướng dẫn âm thanh (giữ nguyên)
+        ctx.setFont(infoFont);
+        ctx.setFill(Color.LIGHTGRAY);
+        ctx.fillText("Press M to toggle sound", Config.SCREEN_WIDTH / 2 - 80, Config.SCREEN_HEIGHT - 30);
+
     }
 
     private void clearScreen() {
@@ -332,6 +340,11 @@ public class MenuScene extends SceneManager {
         if (event.getEventType() == KeyEvent.KEY_PRESSED) {
             handleKeyPress(event);
         }
+
+        if (event.getCode() == KeyCode.H) {
+            soundManager.playSound("hit");
+            onHighscoreSelected.run();
+        }
     }
 
     private void handleKeyPress(KeyEvent event) {
@@ -377,7 +390,8 @@ public class MenuScene extends SceneManager {
             case 0 -> startGame();
             case 1 -> showInstruction();
             case 2 -> showCredits();
-            case 3 -> exitGame();
+            case 3 -> showHighscore();
+            case 4 -> exitGame();
         }
     }
 
@@ -393,6 +407,12 @@ public class MenuScene extends SceneManager {
 
     private void showCredits() {
         currentState = MenuState.CREDITS;
+    }
+
+    private void showHighscore() {
+        if (onHighscoreSelected != null) {
+            onHighscoreSelected.run();
+        }
     }
 
     private void returnToMainMenu() {

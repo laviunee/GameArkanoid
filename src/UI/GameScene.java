@@ -11,6 +11,7 @@ import Entities.Bricks.StrongBrick;
 import Entities.Power.PowerUp;
 import Entities.Power.PowerFactory;
 import Utils.Config;
+import Utils.SaveManager;
 import Utils.SoundManager;
 import Utils.SpriteLoader;
 import javafx.scene.canvas.Canvas;
@@ -236,14 +237,27 @@ public class GameScene extends SceneManager {
         if (bricks.isEmpty()) {
             System.out.println("YOU WIN!");
             isRunning = false;
+            checkHighscore();
         }
 
         if (lives <= 0) {
             System.out.println("GAME OVER!");
             isRunning = false;
+            checkHighscore();
         }
     }
 
+    // Thêm method mới
+    private void checkHighscore() {
+        SaveManager saveManager = SaveManager.getInstance();
+        if (saveManager.isHighscore(score)) {
+            // Chuyển đến scene nhập tên
+            gameEngine.switchToNameInputScene(score, 1); // Giả sử level 1
+        } else {
+            // Hoặc chuyển thẳng đến highscore
+            gameEngine.switchToHighscoreScene();
+        }
+    }
     @Override
     public void render() {
         drawBackground();

@@ -3,8 +3,11 @@ package Engine;
 import UI.GameScene;
 import UI.MenuScene;
 import UI.PauseScene;
+import UI.HighscoreScene;
+import UI.NameInputScene;
 import Utils.Config;
 import Utils.SoundManager;
+import Utils.SaveManager;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -27,6 +30,9 @@ public class GameEngine extends Application {
     private GameScene gameScene;
     private MenuScene menuScene;
     private SoundManager soundManager;
+    private HighscoreScene highscoreScene;
+    private NameInputScene nameInputScene;
+    private SaveManager saveManager;
 
     @Override
     public void start(Stage primaryStage) {
@@ -48,6 +54,8 @@ public class GameEngine extends Application {
         soundManager = SoundManager.getInstance();
         soundManager.initialize();
 
+        System.out.println("💾 Initializing SaveManager...");
+        saveManager = SaveManager.getInstance();
         // Test sound
         soundManager.playSound("hit");
     }
@@ -56,10 +64,13 @@ public class GameEngine extends Application {
         System.out.println("🎮 Initializing Scenes...");
 
         // Truyền callback lambda
-        menuScene = new MenuScene(ctx, () -> {
-            soundManager.onGameStart();
-            switchToGameScene();
-        });
+//        menuScene = new MenuScene(ctx, () -> {
+//            soundManager.onGameStart();
+//            switchToGameScene();
+//        }, this::switchToHighscoreScene
+//        );
+
+        menuScene = new MenuScene(ctx, this::switchToGameScene, this::switchToHighscoreScene);
 
         gameScene = new GameScene(ctx, this);
 
@@ -68,6 +79,12 @@ public class GameEngine extends Application {
                 this::resumeGame,
                 this::restartGame,
                 this::switchToMenuScene);
+
+        // Khởi tạo HighscoreScene
+        highscoreScene = new HighscoreScene(ctx, this::switchToMenuScene);
+
+        // NameInputScene sẽ được tạo khi cần, khởi tạo là null
+        nameInputScene = null;
 
         // Bắt đầu với Menu
         currentScene = menuScene;
@@ -154,6 +171,21 @@ public class GameEngine extends Application {
         System.out.println("Switched to Menu Scene");
     }
 
+    public void switchToHighscoreScene() {
+        if (currentScene != null) currentScene.cleanup();
+        currentScene = highscoreScene;
+        currentScene.start();
+        System.out.println("🏆 Switched to Highscore Scene");
+    }
+
+    public void switchToNameInputScene(int score, int level) {
+        if (currentScene != null) currentScene.cleanup();
+        nameInputScene = new NameInputScene(ctx, score, level, this::switchToHighscoreScene);
+        currentScene = nameInputScene;
+        currentScene.start();
+        System.out.println("📝 Switched to Name Input Scene");
+    }
+
     public void pauseGame() {
         if (currentScene == gameScene) {
             currentScene = pauseScene;
@@ -182,11 +214,30 @@ public class GameEngine extends Application {
         System.out.println("Game restarted");
     }
 
+    public void gameOver(int score, int level) {
+        System.out.println("💀 Game Over - Score: " + score + ", Level: " + level);
+
+        // Kiểm tra xem có phải highscore mới không
+        if (saveManager.isHighscore(score)) {
+            System.out.println("🎉 New Highscore Achieved!");
+            switchToNameInputScene(score, level);
+        } else {
+            System.out.println("😊 No new highscore, returning to menu");
+            switchToMenuScene();
+        }
+    }
+
     @Override
     public void stop() {
         isRunning = false;
         if (currentScene != null) currentScene.cleanup();
         if (soundManager != null) soundManager.cleanup();
+        if (saveManager != null) saveManager.cleanup();
         System.out.println("GameEngine Stopped");
+    }
+
+    // Utility method để game scene có thể gọi game over
+    public void notifyGameOver(int score, int level) {
+        gameOver(score, level);
     }
 }
