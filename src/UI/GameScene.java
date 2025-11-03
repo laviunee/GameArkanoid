@@ -42,6 +42,7 @@ public class GameScene extends SceneManager {
 
     // Pause scene và trạng thái pause
     private GameEngine gameEngine;
+    private Runnable onGameOver;
     private PauseScene pauseScene;
     private boolean isPaused = false;
 
@@ -64,10 +65,11 @@ public class GameScene extends SceneManager {
     private javafx.scene.image.Image pierceImage;
 
 
-    public GameScene(GraphicsContext ctx, GameEngine gameEngine) {
+    public GameScene(GraphicsContext ctx, GameEngine gameEngine, Runnable onGameOver) {
         this.ctx = ctx;
         this.canvas = ctx.getCanvas();
         this.gameEngine = gameEngine;
+        this.onGameOver = onGameOver;
         this.soundManager = SoundManager.getInstance();
         this.spriteLoader = SpriteLoader.getInstance();
         this.isRunning = true;
@@ -128,6 +130,17 @@ public class GameScene extends SceneManager {
         paddle.stop();
     }
 
+    private void handleGameOver() {
+        System.out.println("🎮 GameScene: Game Over detected");
+        if (onGameOver != null) {
+            onGameOver.run(); // Gọi callback khi game over
+        } else {
+            System.err.println("❌ GameScene: onGameOver callback is null!");
+            // Fallback: chuyển thẳng đến menu
+            gameEngine.switchToMenuScene();
+        }
+    }
+
     // THÊM: Bật/tắt điều khiển chuột
     private void toggleMouseControl() {
         mouseControlEnabled = !mouseControlEnabled;
@@ -150,6 +163,10 @@ public class GameScene extends SceneManager {
         System.out.println("Returning to main menu");
         // TODO: Implement return to main menu logic
         // Ví dụ: sceneManager.switchToScene("MainMenu");
+    }
+
+    public int getCurrentLevel() {
+        return 1; // Hiện tại mặc định level 1, có thể thay đổi sau
     }
 
     private void loadGameSprites() {
@@ -243,7 +260,7 @@ public class GameScene extends SceneManager {
         if (lives <= 0) {
             System.out.println("GAME OVER!");
             isRunning = false;
-            checkHighscore();
+            handleGameOver();
         }
     }
 
@@ -255,7 +272,7 @@ public class GameScene extends SceneManager {
             gameEngine.switchToNameInputScene(score, 1); // Giả sử level 1
         } else {
             // Hoặc chuyển thẳng đến highscore
-            gameEngine.switchToHighscoreScene();
+            handleGameOver();
         }
     }
     @Override

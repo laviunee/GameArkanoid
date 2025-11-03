@@ -1,10 +1,6 @@
 package Engine;
 
-import UI.GameScene;
-import UI.MenuScene;
-import UI.PauseScene;
-import UI.HighscoreScene;
-import UI.NameInputScene;
+import UI.*;
 import Utils.Config;
 import Utils.SoundManager;
 import Utils.SaveManager;
@@ -29,6 +25,7 @@ public class GameEngine extends Application {
     private SceneManager currentScene;
     private GameScene gameScene;
     private MenuScene menuScene;
+    private GameOverScene gameOverScene;
     private SoundManager soundManager;
     private HighscoreScene highscoreScene;
     private NameInputScene nameInputScene;
@@ -72,7 +69,10 @@ public class GameEngine extends Application {
 
         menuScene = new MenuScene(ctx, this::switchToGameScene, this::switchToHighscoreScene);
 
-        gameScene = new GameScene(ctx, this);
+        gameScene = new GameScene(ctx, this, () -> {
+            // Callback khi game over
+            gameOver(gameScene.getScore(), gameScene.getCurrentLevel());
+        });
 
         // Khởi tạo PauseScene với các callback
         pauseScene = new PauseScene(ctx,
@@ -85,6 +85,7 @@ public class GameEngine extends Application {
 
         // NameInputScene sẽ được tạo khi cần, khởi tạo là null
         nameInputScene = null;
+        gameOverScene = null;
 
         // Bắt đầu với Menu
         currentScene = menuScene;
@@ -186,6 +187,20 @@ public class GameEngine extends Application {
         System.out.println("📝 Switched to Name Input Scene");
     }
 
+    public void switchToGameOverScene(int score, int level) {
+        if (currentScene != null) currentScene.cleanup();
+
+        // Tạo GameOverScene mới
+        gameOverScene = new GameOverScene(ctx, score, level,
+                this::restartGame,
+                this::switchToMenuScene
+        );
+
+        currentScene = gameOverScene;
+        currentScene.start();
+        System.out.println("💀 Switched to Game Over Scene - Score: " + score + ", Level: " + level);
+    }
+
     public void pauseGame() {
         if (currentScene == gameScene) {
             currentScene = pauseScene;
@@ -207,7 +222,9 @@ public class GameEngine extends Application {
         if (currentScene != null) currentScene.cleanup();
 
         // Tạo game scene mới
-        gameScene = new GameScene(ctx, this);
+        gameScene = new GameScene(ctx, this, () -> {
+            gameOver(gameScene.getScore(), gameScene.getCurrentLevel());
+        });
         currentScene = gameScene;
         currentScene.start();
 
@@ -221,10 +238,14 @@ public class GameEngine extends Application {
         if (saveManager.isHighscore(score)) {
             System.out.println("🎉 New Highscore Achieved!");
             switchToNameInputScene(score, level);
-        } else {
-            System.out.println("😊 No new highscore, returning to menu");
-            switchToMenuScene();
         }
+//        } else {
+//            System.out.println("😊 No new highscore, returning to menu");
+//            switchToGameOverScene(score, level);
+//        }
+
+        // LUÔN HIỂN THỊ GAME OVER SCENE
+        switchToGameOverScene(score, level);
     }
 
     @Override
