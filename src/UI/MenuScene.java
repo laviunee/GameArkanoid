@@ -153,10 +153,10 @@ public class MenuScene extends SceneManager {
             case INSTRUCTION -> drawInstructionScreen();
             case CREDITS -> drawCreditsScreen();
         }
-        // Hiển thị hướng dẫn âm thanh (giữ nguyên)
-        ctx.setFont(infoFont);
-        ctx.setFill(Color.LIGHTGRAY);
-        ctx.fillText("Press M to toggle sound", Config.SCREEN_WIDTH / 2 - 80, Config.SCREEN_HEIGHT - 30);
+//        // Hiển thị hướng dẫn âm thanh (giữ nguyên)
+//        ctx.setFont(infoFont);
+//        ctx.setFill(Color.LIGHTGRAY);
+//        ctx.fillText("Press M to toggle sound", Config.SCREEN_WIDTH / 2 - 80, Config.SCREEN_HEIGHT - 30);
 
     }
 
@@ -220,11 +220,11 @@ public class MenuScene extends SceneManager {
                 ctx.setFill(Color.YELLOW);
                 ctx.setStroke(Color.ORANGE);
                 ctx.setLineWidth(2);
-                ctx.strokeText("➤ " + options[i], Config.SCREEN_WIDTH / 2 - 150, 420 + i * 60);
-                ctx.fillText("➤ " + options[i], Config.SCREEN_WIDTH / 2 - 150, 420 + i * 60);
+                ctx.strokeText("➤ " + options[i], Config.SCREEN_WIDTH / 2 - 150, 410 + i * 55);
+                ctx.fillText("➤ " + options[i], Config.SCREEN_WIDTH / 2 - 150, 410 + i * 55);
             } else {
                 ctx.setFill(Color.WHITE);
-                ctx.fillText(options[i], Config.SCREEN_WIDTH / 2 - 120, 420 + i * 60);
+                ctx.fillText(options[i], Config.SCREEN_WIDTH / 2 - 120, 410 + i * 55);
             }
         }
     }
@@ -311,9 +311,9 @@ public class MenuScene extends SceneManager {
         // 🎯 MAIN MENU INSTRUCTIONS DÙNG FONT HỆ THỐNG
         ctx.setFont(infoFont);
         ctx.setFill(Color.LIGHTGRAY);
-        ctx.fillText("USE ↑↓ OR W/S TO NAVIGATE", Config.SCREEN_WIDTH / 2 - 120, 650);
-        ctx.fillText("PRESS ENTER TO SELECT", Config.SCREEN_WIDTH / 2 - 120, 680);
-        ctx.fillText("PRESS M TO TOGGLE SOUND", Config.SCREEN_WIDTH / 2 - 120, 710);
+        ctx.fillText("USE ↑↓ OR W/S TO NAVIGATE", Config.SCREEN_WIDTH / 2 - 120, 660);
+        ctx.fillText("PRESS ENTER TO SELECT", Config.SCREEN_WIDTH / 2 - 120, 690);
+        ctx.fillText("PRESS M TO TOGGLE SOUND", Config.SCREEN_WIDTH / 2 - 120, 720);
     }
 
     private void drawCreditsInstructions() {
