@@ -62,8 +62,8 @@ public class GameScene extends SceneManager {
     private javafx.scene.image.Image powerupExpandImage;
     private javafx.scene.image.Image powerupFastballImage;
     private javafx.scene.image.Image powerupMultiballImage;
-    private javafx.scene.image.Image pierceImage;
-
+    private javafx.scene.image.Image powerupExtraliveImage;
+    private javafx.scene.image.Image powerupPierceballImage;
 
     public GameScene(GraphicsContext ctx, GameEngine gameEngine, Runnable onGameOver) {
         this.ctx = ctx;
@@ -73,7 +73,7 @@ public class GameScene extends SceneManager {
         this.soundManager = SoundManager.getInstance();
         this.spriteLoader = SpriteLoader.getInstance();
         this.isRunning = true;
-        this.pauseScene = null; //PauseScene sẽ được GameEngine quản lý
+        this.pauseScene = null;
         loadGameSprites();
         setupMouseControls();
     }
@@ -132,6 +132,8 @@ public class GameScene extends SceneManager {
 
     private void handleGameOver() {
         System.out.println("🎮 GameScene: Game Over detected");
+        soundManager.onGameOver(); // THÊM: Thông báo game over cho sound manager
+
         if (onGameOver != null) {
             onGameOver.run(); // Gọi callback khi game over
         } else {
@@ -158,13 +160,6 @@ public class GameScene extends SceneManager {
         System.out.println("Game resumed");
     }
 
-    // THÊM: Method để return to main menu (cần implement)
-    private void returnToMainMenu() {
-        System.out.println("Returning to main menu");
-        // TODO: Implement return to main menu logic
-        // Ví dụ: sceneManager.switchToScene("MainMenu");
-    }
-
     public int getCurrentLevel() {
         return 1; // Hiện tại mặc định level 1, có thể thay đổi sau
     }
@@ -181,7 +176,6 @@ public class GameScene extends SceneManager {
             // Load ball
             ballImage = spriteLoader.loadSprite("/images/ball.png");
 
-
             // Load bricks
             brickNormalImage = spriteLoader.loadSprite("/images/bricks/normal.png");
             brickStrongImage = spriteLoader.loadSprite("/images/bricks/strong.png");
@@ -191,7 +185,8 @@ public class GameScene extends SceneManager {
             powerupExpandImage = spriteLoader.loadSprite("/images/powerup/expand.png");
             powerupFastballImage = spriteLoader.loadSprite("/images/powerup/fastball.png");
             powerupMultiballImage = spriteLoader.loadSprite("/images/powerup/multiball.png");
-            pierceImage = spriteLoader.loadSprite("/images/powerup/pierce.png");
+            powerupExtraliveImage = spriteLoader.loadSprite("/images/powerup/extralive.png");
+            powerupPierceballImage = spriteLoader.loadSprite("/images/powerup/pierceball.png");
             System.out.println("Game sprites loaded successfully");
 
         } catch (Exception e) {
@@ -201,6 +196,10 @@ public class GameScene extends SceneManager {
 
     @Override
     public void start() {
+        System.out.println("🎮 GameScene: Starting game...");
+
+        soundManager.stopAllSounds();
+
         double paddleX = Config.SCREEN_WIDTH / 2;
         double paddleY = Config.SCREEN_HEIGHT - Config.PADDLE_OFFSET_Y;
         paddle = new Paddle(paddleX, paddleY);
@@ -210,7 +209,6 @@ public class GameScene extends SceneManager {
         Entities.Power.PowerFactory.setBalls(balls);
         Entities.Power.PowerFactory.setGameScene(this);
 
-
         bricks = new ArrayList<>();
         setupBricks();
 
@@ -219,8 +217,12 @@ public class GameScene extends SceneManager {
         lives = 3;
 
         isRunning = true;
-        isPaused = false; // Đảm bảo không pause khi bắt đầu
-        mouseControlEnabled = false; // Reset điều khiển chuột
+        isPaused = false;
+        mouseControlEnabled = false;
+
+        // QUAN TRỌNG: Báo cho SoundManager biết game đã bắt đầu
+        soundManager.onGameStart();
+        System.out.println("🎵 GameScene: Game start signal sent to SoundManager");
     }
 
     @Override
@@ -254,6 +256,7 @@ public class GameScene extends SceneManager {
         if (bricks.isEmpty()) {
             System.out.println("YOU WIN!");
             isRunning = false;
+            soundManager.onGameWin(); // THÊM: Thông báo win cho sound manager
             checkHighscore();
         }
 
@@ -275,6 +278,7 @@ public class GameScene extends SceneManager {
             handleGameOver();
         }
     }
+
     @Override
     public void render() {
         drawBackground();
@@ -416,7 +420,7 @@ public class GameScene extends SceneManager {
             if (!ball.isActive()) continue;
 
             if (CollisionManager.checkBallPaddleCollision(ball, paddle)) {
-                soundManager.playSound("hit");
+                soundManager.playSound("paddle_hit");
             }
 
             for (Brick brick : bricks) {
@@ -452,25 +456,31 @@ public class GameScene extends SceneManager {
             if (ball.getPosition().y + ball.getRadius() >= Config.SCREEN_HEIGHT) {
                 System.out.println("Ball lost at bottom!");
                 ballsToRemove.add(ball);
-                soundManager.playSound("lose");
             }
-        }
 
-        // Xóa các bóng đã rơi
-        balls.removeAll(ballsToRemove);
+// Xóa các bóng đã rơi
+            balls.removeAll(ballsToRemove);
 
-        // Chỉ trừ mạng khi KHÔNG còn bóng nào
-        if (balls.isEmpty()) {
-            lives--;
-            System.out.println("All balls lost! Lives remaining: " + lives);
+// Chỉ trừ mạng khi KHÔNG còn bóng nào
+            if (balls.isEmpty()) {
+                lives--;
+                System.out.println("All balls lost! Lives remaining: " + lives);
 
-            if (lives > 0) {
-                System.out.println("Respawning NEW ball on paddle");
-                spawnBall();
+                if (lives > 0) {
+                    // 🔹 Mất 1 mạng nhưng chưa thua -> nhạc lose1
+                    soundManager.onLoseLife();
+                    System.out.println("Respawning NEW ball on paddle");
+                    spawnBall();
+                } else {
+                    // 🔹 Hết mạng thật -> nhạc lose (drama)
+                    soundManager.onGameOver();
+                    System.out.println("GAME OVER!");
+                    isRunning = false;
+                    handleGameOver();
+                }
             }
         }
     }
-
 
     private void checkPowerUpCollisions() {
         List<PowerUp> collectedPowerUps = new ArrayList<>();
@@ -603,14 +613,15 @@ public class GameScene extends SceneManager {
     }
 
     private void drawPowerUps() {
+        double size = 25; // Kích thước thống nhất cho mọi power-up
+
         for (PowerUp powerUp : powerUps) {
             if (powerUp.isCollected()) continue;
 
-            double size = 40;
-            double x = powerUp.getPosition().x - size/2;
-            double y = powerUp.getPosition().y - size/2;
+            double x = powerUp.getPosition().x - size / 2;
+            double y = powerUp.getPosition().y - size / 2;
 
-            javafx.scene.image.Image powerupImage = null;
+            Image powerupImage = null;
 
             // XÁC ĐỊNH ẢNH CHO TỪNG LOẠI POWER-UP
             if (powerUp instanceof Entities.Power.ExpandPaddle) {
@@ -618,66 +629,26 @@ public class GameScene extends SceneManager {
             } else if (powerUp instanceof Entities.Power.FastBall) {
                 powerupImage = powerupFastballImage;
             } else if (powerUp instanceof Entities.Power.PowerUpMultiBall) {
-                powerupImage = ballImage; //DÙNG HÌNH BALL
+                powerupImage = powerupMultiballImage;
             } else if (powerUp instanceof Entities.Power.PowerUpExtraLive) {
-                powerupImage = paddleImage;
+                powerupImage = powerupExtraliveImage;
             } else if (powerUp instanceof Entities.Power.PowerUpPierceBall) {
-                powerupImage = pierceImage;
+                powerupImage = powerupPierceballImage;
             }
 
-
-
+            // VẼ ẢNH (đã chuẩn hóa)
             if (powerupImage != null) {
-
-                double width = 40;  // mặc định cho power-up khác
-                double height = 40;
-
-                // PierceBall → dùng kích thước nhỏ hơn
-                if (powerUp instanceof Entities.Power.PowerUpPierceBall) {
-                    width = 20;
-                    height = 20;
-                }
-
-
-                // Thu nhỏ MULTIBALL
-                if (powerUp instanceof Entities.Power.PowerUpMultiBall) {
-                    width = 20;   // chỉnh tùy ý: 18 ~ 26 rất đẹp
-                    height = 20;
-                }
-
-                // ExtraLive → thu nhỏ hơn
-                if (powerUp instanceof Entities.Power.PowerUpExtraLive) {
-                    width = paddleImage.getWidth() * 0.5;   // 50% kích thước paddle
-                    height = paddleImage.getHeight() * 0.5;
-                }
-                ctx.drawImage(powerupImage, x, y, width, height);
+                ctx.drawImage(powerupImage, x, y, size, size);
+            } else {
+                // Fallback nếu thiếu ảnh
+                ctx.setFill(Color.MAGENTA);
+                ctx.fillRect(x, y, size, size);
+                ctx.setStroke(Color.BLACK);
+                ctx.strokeRect(x, y, size, size);
             }
-
         }
     }
 
-    // METHOD FALLBACK CHO POWER-UP
-    private void drawPowerUpFallback(PowerUp powerUp, double x, double y, double size) {
-        if (powerUp instanceof Entities.Power.ExpandPaddle) {
-            ctx.setFill(Color.BLUE);
-        } else if (powerUp instanceof Entities.Power.FastBall) {
-            ctx.setFill(Color.RED);
-        } else {
-            ctx.setFill(Color.GREEN);
-        }
-
-
-        ctx.fillRect(x, y, size, size);
-        ctx.setStroke(Color.WHITE);
-        ctx.strokeRect(x, y, size, size);
-
-        ctx.setFill(Color.WHITE);
-        if (powerUp instanceof Entities.Power.ExpandPaddle) {
-            ctx.fillText("E", x + size/2 - 3, y + size/2 + 3);
-        } else if (powerUp instanceof Entities.Power.FastBall) {
-            ctx.fillText("F", x + size/2 - 3, y + size/2 + 3);
-        }
-    }
 
     private void drawPaddle() {
         double x = paddle.getPosition().x - paddle.getWidth()/2;

@@ -13,7 +13,7 @@ public class PowerUpMultiBall extends PowerUp {
     public PowerUpMultiBall(double x, double y, List<Ball> balls) {
         super("MultiBall", x, y);
         this.balls = balls;
-        this.icon = new Image("file:assets/images/powerup/ball.png");
+        this.icon = new Image("file:assets/images/powerup/multiball.png");
         setSprite(icon);
     }
 

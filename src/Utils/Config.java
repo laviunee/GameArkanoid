@@ -2,14 +2,14 @@ package Utils;
 
 public class Config {
     // Kích thước màn hình
-    public static final double SCREEN_WIDTH = 560;
-    public static final double SCREEN_HEIGHT = 740;
-    public static final double INSET = 5;
-    public static final double UPPER_INSET = 75;
+    public static final double SCREEN_WIDTH = 600;
+    public static final double SCREEN_HEIGHT = 780;
+    public static final double INSET = 3;
+    public static final double UPPER_INSET = 80;
 
     // Vật lý game
-    public static final double BALL_SPEED = 400.0;
-    public static final double PADDLE_SPEED = 400.0;
+    public static final double BALL_SPEED = 450.0;
+    public static final double PADDLE_SPEED = 500.0;
     public static final double BONUS_BLOCK_SPEED = 70.0;
 
     // Kích thước đối tượng

@@ -130,12 +130,14 @@ public class GameOverScene extends SceneManager {
 
     private void restartGame() {
         if (onRestartGame != null) {
+            soundManager.stopAllSounds();
             onRestartGame.run();
         }
     }
 
     private void returnToMenu() {
         if (onReturnToMenu != null) {
+            soundManager.stopAllSounds();
             onReturnToMenu.run();
         }
     }

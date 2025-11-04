@@ -8,7 +8,7 @@ public class PowerUpPierceBall extends PowerUp {
 
     public PowerUpPierceBall(double x, double y) {
         super("PierceBall", x, y);
-        setSprite(new Image("file:assets/images/powerup/pierce.png"));
+        setSprite(new Image("file:assets/images/powerup/pierceball.png"));
     }
 
     @Override
