@@ -293,6 +293,7 @@ public class SoundManager {
         }
     }
 
+
     public void toggleSound() {
         setSoundEnabled(!soundEnabled);
     }
@@ -306,7 +307,7 @@ public class SoundManager {
         for (AudioClip clip : soundEffects.values()) {
             clip.setVolume(soundVolume);
         }
-        System.out.println("Sound volume: " + (int)(soundVolume * 100) + "%");
+        System.out.println("Sound volume: " + (int) (soundVolume * 100) + "%");
     }
 
     public double getMusicVolume() {
@@ -317,7 +318,7 @@ public class SoundManager {
         this.musicVolume = Math.max(0.0, Math.min(1.0, volume));
         if (menuMusic != null) menuMusic.setVolume(musicVolume);
         if (backgroundMusic != null) backgroundMusic.setVolume(musicVolume);
-        System.out.println("Music volume: " + (int)(musicVolume * 100) + "%");
+        System.out.println("Music volume: " + (int) (musicVolume * 100) + "%");
     }
 
     // ==================== UTILITY ====================
@@ -355,5 +356,13 @@ public class SoundManager {
                 backgroundMusic.getStatus() + " (vol: " + backgroundMusic.getVolume() + ")" : "NULL"));
         System.out.println("Available Sounds: " + soundEffects.keySet());
         System.out.println("============================");
+
+    }
+
+    public void onLevelComplete() {
+        if (isSoundEnabled()) {
+            // Có thể thêm âm thanh level complete ở đây
+            System.out.println("🎵 Level complete sound");
+        }
     }
 }

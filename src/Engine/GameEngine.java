@@ -30,6 +30,23 @@ public class GameEngine extends Application {
     private HighscoreScene highscoreScene;
     private NameInputScene nameInputScene;
     private SaveManager saveManager;
+    private LevelSelectScene levelSelectScene;
+
+    public void switchToLevelSelectScene() {
+        if (levelSelectScene == null) {
+            levelSelectScene = new LevelSelectScene(ctx, this);
+        }
+        currentScene = levelSelectScene;
+        currentScene.start();
+        System.out.println("Switched to Level Select Scene");
+    }
+
+    public void startGameAtLevel(int levelIndex) {
+        switchToGameScene();
+        if (gameScene != null) {
+            gameScene.startGameAtLevel(levelIndex);
+        }
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -67,7 +84,11 @@ public class GameEngine extends Application {
 //        }, this::switchToHighscoreScene
 //        );
 
-        menuScene = new MenuScene(ctx, this::switchToGameScene, this::switchToHighscoreScene);
+        menuScene = new MenuScene(ctx,
+                this::switchToGameScene,
+                this::switchToHighscoreScene,
+                this::switchToLevelSelectScene  // THÊM callback này
+        );
 
         gameScene = new GameScene(ctx, this, () -> {
             // Callback khi game over

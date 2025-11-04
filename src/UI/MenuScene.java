@@ -19,15 +19,16 @@ public class MenuScene extends SceneManager {
     private SpriteLoader spriteLoader;
     private Runnable onStartGame;
     private Runnable onHighscoreSelected;
+    private Runnable onLevelSelectSelected; // THÊM: Callback cho level select
 
     // Menu state
     private boolean isActive;
     private int selectedOption;
-    private final String[] mainOptions = {"START GAME", "INSTRUCTION", "CREDITS", "HIGHSCORE" , "EXIT"};
+    private final String[] mainOptions = {"START GAME", "LEVEL SELECT", "INSTRUCTION", "CREDITS", "HIGHSCORE" , "EXIT"}; // THÊM LEVEL SELECT
     private MenuState currentState;
     private long lastInputTime;
 
-    // UI elements - CHỈ TITLE LOAD FONT TỪ FILE
+    // UI elements
     private Font titleFont;
     private Font optionFont;
     private Font infoFont;
@@ -49,12 +50,14 @@ public class MenuScene extends SceneManager {
         CREDITS
     }
 
-    public MenuScene(GraphicsContext ctx, Runnable onStartGame, Runnable onHighscoreSelected) {
+    // THÊM: Constructor với level select callback
+    public MenuScene(GraphicsContext ctx, Runnable onStartGame, Runnable onHighscoreSelected, Runnable onLevelSelectSelected) {
         this.ctx = ctx;
         this.soundManager = SoundManager.getInstance();
         this.spriteLoader = SpriteLoader.getInstance();
         this.onStartGame = onStartGame;
         this.onHighscoreSelected = onHighscoreSelected;
+        this.onLevelSelectSelected = onLevelSelectSelected; // THÊM
 
         loadFontsFromResources();
 
@@ -65,6 +68,11 @@ public class MenuScene extends SceneManager {
         this.lastUpdateTime = System.currentTimeMillis();
 
         loadMenuSprites();
+    }
+
+    // GIỮ NGUYÊN constructor cũ cho tương thích
+    public MenuScene(GraphicsContext ctx, Runnable onStartGame, Runnable onHighscoreSelected) {
+        this(ctx, onStartGame, onHighscoreSelected, null);
     }
 
     private void loadFontsFromResources() {
@@ -91,7 +99,7 @@ public class MenuScene extends SceneManager {
 
     private void setSystemFonts() {
         // 🎯 OPTION FONT - DÙNG FONT HỆ THỐNG
-        optionFont = Font.font("Arial", FontWeight.BOLD, 35);
+        optionFont = Font.font("Arial", FontWeight.BOLD, 32); // Giảm size để fit thêm option
 
         // 🎯 INFO FONT - DÙNG FONT HỆ THỐNG
         infoFont = Font.font("Courier New", FontWeight.BOLD, 15);
@@ -153,11 +161,6 @@ public class MenuScene extends SceneManager {
             case INSTRUCTION -> drawInstructionScreen();
             case CREDITS -> drawCreditsScreen();
         }
-//        // Hiển thị hướng dẫn âm thanh (giữ nguyên)
-//        ctx.setFont(infoFont);
-//        ctx.setFill(Color.LIGHTGRAY);
-//        ctx.fillText("Press M to toggle sound", Config.SCREEN_WIDTH / 2 - 80, Config.SCREEN_HEIGHT - 30);
-
     }
 
     private void clearScreen() {
@@ -215,16 +218,20 @@ public class MenuScene extends SceneManager {
         ctx.setFont(optionFont);
         String[] options = getCurrentOptions();
 
+        // Điều chỉnh vị trí để fit thêm option
+        int startY = 380;
+        int optionSpacing = 50;
+
         for (int i = 0; i < options.length; i++) {
             if (i == selectedOption) {
                 ctx.setFill(Color.YELLOW);
                 ctx.setStroke(Color.ORANGE);
                 ctx.setLineWidth(2);
-                ctx.strokeText("➤ " + options[i], Config.SCREEN_WIDTH / 2 - 150, 410 + i * 55);
-                ctx.fillText("➤ " + options[i], Config.SCREEN_WIDTH / 2 - 150, 410 + i * 55);
+                ctx.strokeText("➤ " + options[i], Config.SCREEN_WIDTH / 2 - 150, startY + i * optionSpacing);
+                ctx.fillText("➤ " + options[i], Config.SCREEN_WIDTH / 2 - 150, startY + i * optionSpacing);
             } else {
                 ctx.setFill(Color.WHITE);
-                ctx.fillText(options[i], Config.SCREEN_WIDTH / 2 - 120, 410 + i * 55);
+                ctx.fillText(options[i], Config.SCREEN_WIDTH / 2 - 120, startY + i * optionSpacing);
             }
         }
     }
@@ -387,17 +394,29 @@ public class MenuScene extends SceneManager {
 
     private void selectMainMenuOption() {
         switch (selectedOption) {
-            case 0 -> startGame();
-            case 1 -> showInstruction();
-            case 2 -> showCredits();
-            case 3 -> showHighscore();
-            case 4 -> exitGame();
+            case 0 -> startGame();           // START GAME
+            case 1 -> showLevelSelect();     // LEVEL SELECT ← THÊM
+            case 2 -> showInstruction();     // INSTRUCTION
+            case 3 -> showCredits();         // CREDITS
+            case 4 -> showHighscore();       // HIGHSCORE
+            case 5 -> exitGame();            // EXIT
         }
     }
 
     private void startGame() {
         if (onStartGame != null) {
             onStartGame.run();
+        }
+    }
+
+    // THÊM: Method cho Level Select
+    private void showLevelSelect() {
+        if (onLevelSelectSelected != null) {
+            onLevelSelectSelected.run();
+        } else {
+            System.err.println("❌ Level select callback is null!");
+            soundManager.playSound("menu_select");
+            startGame();
         }
     }
 

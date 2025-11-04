@@ -3,7 +3,7 @@ package Entities.Bricks;
 import Utils.Config;
 
 /**
- * Gạch cứng - cần 2 lần va chạm để phá
+ * Gạch cứng - cần nhiều lần va chạm để phá hủy
  */
 public class StrongBrick extends Brick {
 
@@ -15,9 +15,19 @@ public class StrongBrick extends Brick {
         );
     }
 
+    // Constructor với custom hit points
+    public StrongBrick(double x, double y, int hitPoints) {
+        super("StrongBrick", x, y,
+                Config.BLOCK_WIDTH, Config.BLOCK_HEIGHT,
+                hitPoints,  // custom hit points
+                200         // 200 điểm
+        );
+    }
+
     @Override
     public void onHit() {
         super.onHit();
-        System.out.println("Strong brick hit! Remaining: " + hitPoints);
+        // Có thể thêm hiệu ứng đặc biệt ở đây
+        System.out.println("StrongBrick hit! Remaining HP: " + hitPoints);
     }
 }

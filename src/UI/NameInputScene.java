@@ -106,5 +106,6 @@ public class NameInputScene extends SceneManager {
     @Override
     public void cleanup() {
         System.out.println("Name Input Scene cleaned up");
+        soundManager.stopAllSounds();
     }
 }

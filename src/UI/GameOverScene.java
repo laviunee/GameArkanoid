@@ -93,11 +93,11 @@ public class GameOverScene extends SceneManager {
 
     private void handleKeyPress(KeyEvent event) {
         switch (event.getCode()) {
-            case LEFT, A, UP, W -> {
+            case A, UP, W -> {
                 moveSelectionUp();
                 soundManager.playSound("hit");
             }
-            case RIGHT, D, DOWN, S -> {
+            case D, DOWN, S -> {
                 moveSelectionDown();
                 soundManager.playSound("hit");
             }
@@ -199,7 +199,7 @@ public class GameOverScene extends SceneManager {
         // Hướng dẫn
         ctx.setFont(infoFont);
         ctx.setFill(Color.LIGHTGRAY);
-        ctx.fillText("USE ↑↓ OR ←→ TO NAVIGATE", centerX, 450);
+        ctx.fillText("USE ↑↓ TO NAVIGATE", centerX, 450);
         ctx.fillText("PRESS ENTER TO SELECT", centerX, 475);
         ctx.fillText("PRESS M TO TOGGLE SOUND", centerX, 500);
 
