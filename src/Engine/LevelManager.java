@@ -3,6 +3,7 @@ package Engine;
 import Entities.Bricks.Brick;
 import Entities.Bricks.NormalBrick;
 import Entities.Bricks.StrongBrick;
+import Entities.Enemy.Boss;
 import Utils.Config;
 import javafx.scene.paint.Color;
 
@@ -91,6 +92,8 @@ public class LevelManager {
         this.bricks = new ArrayList<>();
     }
 
+    private Boss boss;
+
     public void loadLevel(int levelNumber) {
         if (levelNumber < 0 || levelNumber >= LEVELS.size()) {
             throw new IllegalArgumentException("Invalid level number: " + levelNumber);
@@ -98,11 +101,33 @@ public class LevelManager {
 
         this.currentLevel = levelNumber;
         this.bricks.clear();
+        this.boss = null;
+
+        // tạo boss cho level5 (index=4)
+        if (levelNumber == 4) {
+            createBoss();
+        }
 
         // Load background for this level
         loadLevelBackground(levelNumber);
-
         createBricks(LEVELS.get(levelNumber));
+    }
+
+    private void createBoss() {
+        double bossX = (Config.SCREEN_WIDTH - 200) / 2; // Căn giữa
+        double bossY = 100; // Vị trí trên cùng
+        this.boss = new Boss(bossX, bossY);
+        this.boss.start();
+
+        System.out.println("👹 Final Boss created for Level 5!");
+    }
+
+    public Boss getBoss() {
+        return boss;
+    }
+
+    public boolean hasBoss() {
+        return boss != null && boss.isActive();
     }
 
     private void loadLevelBackground(int levelNumber) {
@@ -193,6 +218,9 @@ public class LevelManager {
     }
 
     public boolean isLevelCompleted() {
+        if (hasBoss()) {
+            return bricks.isEmpty() && !boss.isActive(); // Phải phá hết gạch VÀ đánh bại boss
+        }
         return bricks.isEmpty();
     }
 
