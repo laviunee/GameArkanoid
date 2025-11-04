@@ -57,13 +57,35 @@ public class LevelManager {
 
     private static final List<BrickType[][]> LEVELS = List.of(LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5);
 
+    // === BACKGROUND PATHS FOR EACH LEVEL ===
+    private static final String[] LEVEL_BACKGROUNDS = {
+            "/images/backgrounds/level1_bg.png",  // Level 1 - Classic
+            "/images/backgrounds/level2_bg.png",  // Level 2 - Ocean
+            "/images/backgrounds/level3_bg.png",  // Level 3 - Space
+            "/images/backgrounds/level4_bg.png",  // Level 4 - Lava
+            "/images/backgrounds/level5_bg.png"   // Level 5 - Final Boss
+    };
+
+    // === FALLBACK COLORS FOR EACH LEVEL ===
+    private static final Color[] LEVEL_BACKGROUND_COLORS = {
+            Color.DARKBLUE,     // Level 1
+            Color.DARKCYAN,     // Level 2
+            Color.DARKSLATEBLUE, // Level 3
+            Color.DARKRED,      // Level 4
+            Color.DARKMAGENTA   // Level 5
+    };
+
     private int currentLevel = 0;
     private List<Brick> bricks;
     private int totalBricks;
 
     // Khoảng cách giữa các brick
-    private static final double HORIZONTAL_GAP = 12;
-    private static final double VERTICAL_GAP = 12;
+    private static final double HORIZONTAL_GAP = 6;
+    private static final double VERTICAL_GAP = 6;
+
+    // Background management
+    private javafx.scene.image.Image currentBackground;
+    private Color currentBackgroundColor;
 
     public LevelManager() {
         this.bricks = new ArrayList<>();
@@ -76,7 +98,33 @@ public class LevelManager {
 
         this.currentLevel = levelNumber;
         this.bricks.clear();
+
+        // Load background for this level
+        loadLevelBackground(levelNumber);
+
         createBricks(LEVELS.get(levelNumber));
+    }
+
+    private void loadLevelBackground(int levelNumber) {
+        try {
+            String backgroundPath = LEVEL_BACKGROUNDS[levelNumber];
+            currentBackground = new javafx.scene.image.Image(
+                    getClass().getResourceAsStream(backgroundPath),
+                    Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT, true, false
+            );
+
+            if (currentBackground.isError()) {
+                throw new Exception("Background image failed to load");
+            }
+
+            System.out.println("✅ Loaded background for Level " + (levelNumber + 1) + ": " + backgroundPath);
+
+        } catch (Exception e) {
+            System.err.println("❌ Failed to load background for Level " + (levelNumber + 1) + ": " + e.getMessage());
+            System.out.println("🔄 Using fallback color background");
+            currentBackground = null;
+            currentBackgroundColor = LEVEL_BACKGROUND_COLORS[levelNumber];
+        }
     }
 
     private void createBricks(BrickType[][] layout) {
@@ -89,7 +137,7 @@ public class LevelManager {
         // Tính toán vị trí bắt đầu để căn giữa
         double totalWidth = cols * brickWidth + (cols - 1) * HORIZONTAL_GAP;
         double startX = (Config.SCREEN_WIDTH - totalWidth) / 2;
-        double startY = Config.UPPER_INSET + 50; // Tăng khoảng cách từ trên xuống
+        double startY = Config.UPPER_INSET + 80;
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
@@ -108,7 +156,6 @@ public class LevelManager {
 
         this.totalBricks = bricks.size();
         System.out.println("Level " + (currentLevel + 1) + " loaded with " + totalBricks + " bricks");
-        System.out.println("Brick spacing - Horizontal: " + HORIZONTAL_GAP + ", Vertical: " + VERTICAL_GAP);
     }
 
     private Brick createBrick(BrickType type, double x, double y) {
@@ -123,6 +170,20 @@ public class LevelManager {
         };
     }
 
+    // === GETTERS FOR BACKGROUND ===
+    public javafx.scene.image.Image getCurrentBackground() {
+        return currentBackground;
+    }
+
+    public Color getCurrentBackgroundColor() {
+        return currentBackgroundColor;
+    }
+
+    public boolean hasCustomBackground() {
+        return currentBackground != null && !currentBackground.isError();
+    }
+
+    // === EXISTING GETTERS ===
     public List<Brick> getBricks() {
         return bricks;
     }
@@ -163,11 +224,5 @@ public class LevelManager {
 
     public void reset() {
         loadLevel(currentLevel);
-    }
-
-    // Method để điều chỉnh khoảng cách nếu cần
-    public static void setBrickSpacing(double horizontalGap, double verticalGap) {
-        // Có thể thêm logic để thay đổi khoảng cách động
-        System.out.println("Brick spacing set to: H=" + horizontalGap + ", V=" + verticalGap);
     }
 }

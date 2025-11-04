@@ -512,22 +512,35 @@ public class GameScene extends SceneManager {
 
     // === RENDER METHODS ===
     private void drawBackground() {
-        if (gameBackground != null && !gameBackground.isError()) {
-            ctx.drawImage(gameBackground, 0, 0, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
+        // Sử dụng background từ LevelManager
+        if (levelManager.hasCustomBackground()) {
+            javafx.scene.image.Image levelBackground = levelManager.getCurrentBackground();
+            if (levelBackground != null && !levelBackground.isError()) {
+                ctx.drawImage(levelBackground, 0, 0, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
+                return;
+            }
+        }
+
+        // Fallback: sử dụng màu nền từ LevelManager
+        Color backgroundColor = levelManager.getCurrentBackgroundColor();
+        if (backgroundColor != null) {
+            ctx.setFill(backgroundColor);
+            ctx.fillRect(0, 0, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
         } else {
-            // Fallback background
+            // Fallback cũ
             ctx.setFill(Color.BLACK);
             ctx.fillRect(0, 0, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
-
-            ctx.setFill(Color.DARKBLUE);
-            ctx.fillRect(Config.INSET, Config.UPPER_INSET,
-                    Config.SCREEN_WIDTH - 2 * Config.INSET,
-                    Config.SCREEN_HEIGHT - Config.UPPER_INSET - Config.INSET);
-
-            ctx.setFill(Color.GRAY);
-            ctx.fillRect(0, Config.UPPER_INSET, Config.INSET, Config.SCREEN_HEIGHT - Config.UPPER_INSET);
-            ctx.fillRect(Config.SCREEN_WIDTH - Config.INSET, Config.UPPER_INSET, Config.INSET, Config.SCREEN_HEIGHT - Config.UPPER_INSET);
         }
+
+        // Vẽ border và các phần khác
+        ctx.setFill(Color.DARKBLUE);
+        ctx.fillRect(Config.INSET, Config.UPPER_INSET,
+                Config.SCREEN_WIDTH - 2 * Config.INSET,
+                Config.SCREEN_HEIGHT - Config.UPPER_INSET - Config.INSET);
+
+        ctx.setFill(Color.GRAY);
+        ctx.fillRect(0, Config.UPPER_INSET, Config.INSET, Config.SCREEN_HEIGHT - Config.UPPER_INSET);
+        ctx.fillRect(Config.SCREEN_WIDTH - Config.INSET, Config.UPPER_INSET, Config.INSET, Config.SCREEN_HEIGHT - Config.UPPER_INSET);
     }
 
     private void drawBricks() {
