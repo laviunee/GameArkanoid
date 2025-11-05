@@ -6,8 +6,7 @@ import Engine.LevelManager;
 import Engine.SceneManager;
 import Entities.Ball;
 import Entities.Bricks.StrongBrick;
-import Entities.Bricks.NormalBrick; // THÊM IMPORT
-import Entities.Enemy.Boss;
+import Entities.Bricks.NormalBrick;
 import Entities.Paddle;
 import Entities.Bricks.Brick;
 import Entities.Power.PowerUp;
@@ -167,11 +166,6 @@ public class GameScene extends SceneManager {
             }
         }
 
-        if (levelManager.hasBoss()) {
-            levelManager.getBoss().update(deltaTime);
-            checkBossCollisions();
-        }
-
         // Update power-ups
         updatePowerUps(deltaTime);
 
@@ -195,45 +189,11 @@ public class GameScene extends SceneManager {
         }
     }
 
-    private void checkBossCollisions() {
-        if (!levelManager.hasBoss()) return;
-
-        Boss boss = levelManager.getBoss();
-
-        // Check ball collision với boss
-        for (Ball ball : balls) {
-            if (ball.isActive() && checkBallBossCollision(ball, boss)) {
-                boss.onHit(10); // Mỗi lần trúng mất 10 máu
-                // Xử lý bounce ball...
-            }
-        }
-
-        // Check boss balls collision với paddle
-        for (Ball bossBall : boss.getBossBalls()) {
-            if (CollisionManager.checkBallPaddleCollision(bossBall, paddle)) {
-                // Xử lý paddle bị đánh...
-            }
-        }
-    }
-
-    private boolean checkBallBossCollision(Ball ball, Boss boss) {
-        // Simple rectangle collision
-        return ball.getPosition().x + ball.getRadius() >= boss.getPosition().x &&
-                ball.getPosition().x - ball.getRadius() <= boss.getPosition().x + boss.getWidth() &&
-                ball.getPosition().y + ball.getRadius() >= boss.getPosition().y &&
-                ball.getPosition().y - ball.getRadius() <= boss.getPosition().y + boss.getHeight();
-    }
 
     @Override
     public void render() {
         drawBackground();
         drawBricks();
-
-        if (levelManager.hasBoss()) {
-            levelManager.getBoss().render(ctx);
-        }
-
-
         drawPowerUps();
         drawPaddle();
         drawBalls();

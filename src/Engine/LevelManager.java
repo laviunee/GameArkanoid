@@ -3,7 +3,6 @@ package Engine;
 import Entities.Bricks.Brick;
 import Entities.Bricks.NormalBrick;
 import Entities.Bricks.StrongBrick;
-import Entities.Enemy.Boss;
 import Utils.Config;
 import javafx.scene.paint.Color;
 
@@ -64,7 +63,7 @@ public class LevelManager {
             "/images/backgrounds/level2_bg.png",  // Level 2 - Ocean
             "/images/backgrounds/level3_bg.png",  // Level 3 - Space
             "/images/backgrounds/level4_bg.png",  // Level 4 - Lava
-            "/images/backgrounds/level5_bg.png"   // Level 5 - Final Boss
+            "/images/backgrounds/level5_bg.png"   // Level 5 - Final
     };
 
     // === FALLBACK COLORS FOR EACH LEVEL ===
@@ -92,7 +91,6 @@ public class LevelManager {
         this.bricks = new ArrayList<>();
     }
 
-    private Boss boss;
 
     public void loadLevel(int levelNumber) {
         if (levelNumber < 0 || levelNumber >= LEVELS.size()) {
@@ -101,34 +99,13 @@ public class LevelManager {
 
         this.currentLevel = levelNumber;
         this.bricks.clear();
-        this.boss = null;
 
-        // tạo boss cho level5 (index=4)
-        if (levelNumber == 4) {
-            createBoss();
-        }
 
         // Load background for this level
         loadLevelBackground(levelNumber);
         createBricks(LEVELS.get(levelNumber));
     }
 
-    private void createBoss() {
-        double bossX = (Config.SCREEN_WIDTH - 200) / 2; // Căn giữa
-        double bossY = 100; // Vị trí trên cùng
-        this.boss = new Boss(bossX, bossY);
-        this.boss.start();
-
-        System.out.println("👹 Final Boss created for Level 5!");
-    }
-
-    public Boss getBoss() {
-        return boss;
-    }
-
-    public boolean hasBoss() {
-        return boss != null && boss.isActive();
-    }
 
     private void loadLevelBackground(int levelNumber) {
         try {
@@ -218,9 +195,6 @@ public class LevelManager {
     }
 
     public boolean isLevelCompleted() {
-        if (hasBoss()) {
-            return bricks.isEmpty() && !boss.isActive(); // Phải phá hết gạch VÀ đánh bại boss
-        }
         return bricks.isEmpty();
     }
 
