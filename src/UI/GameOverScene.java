@@ -79,7 +79,7 @@ public class GameOverScene extends SceneManager {
         selectedOption = 0;
         pulseValue = 0;
         lastUpdateTime = System.currentTimeMillis();
-        soundManager.playSound("gameover");
+        soundManager.onGameOver();
     }
 
     @Override
