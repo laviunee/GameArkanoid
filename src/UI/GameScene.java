@@ -18,6 +18,7 @@ import Utils.SpriteLoader;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -26,6 +27,7 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
+import javafx.scene.image.PixelWriter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +70,13 @@ public class GameScene extends SceneManager {
     private Image powerupMultiballImage;
     private Image powerupExtraliveImage;
     private Image powerupPierceballImage;
+
+    //
+    private Image heartIcon;
+    private Image soundOnIcon;
+    private Image soundOffIcon;
+    private Image mouseOnIcon;
+    private Image mouseOffIcon;
 
     public GameScene(GraphicsContext ctx, GameEngine gameEngine, Runnable onGameOver) {
         this.ctx = ctx;
@@ -725,45 +734,92 @@ public class GameScene extends SceneManager {
         ctx.setFill(Color.WHITE);
         ctx.setFont(Font.font(16));
 
-        // Score và Lives
-        ctx.fillText("SCORE: " + score, 20, 30);
-        ctx.fillText("LIVES: " + lives, Config.SCREEN_WIDTH - 80, 30);
+        int iconSize = 20;
+        int iconSpacing = 5;
+        int textOffset = iconSize + iconSpacing;
 
-        // Level info
-        String levelText = "LEVEL: " + levelManager.getCurrentLevel() + "/" + levelManager.getTotalLevels();
+        // === SCORE ===
+        ctx.fillText("SCORE: " + score, 20, 30);
+
+        // === LIVES: CHỈ HIỂN THỊ TRÁI TIM, KHÔNG CÓ SỐ ===
+        double livesStartX = Config.SCREEN_WIDTH - 150;
+        double livesY = 15;
+
+        if (heartIcon != null) {
+            // Vẽ từng trái tim tương ứng với số mạng
+            for (int i = 0; i < lives; i++) {
+                double heartX = livesStartX + (i * (iconSize + 5)); // Mỗi trái tim cách nhau 5px
+                ctx.drawImage(heartIcon, heartX, livesY, iconSize, iconSize);
+            }
+            // ĐÃ XÓA DÒNG HIỂN THỊ SỐ "× " + lives
+        } else {
+            // Fallback: vẽ text như cũ nếu không có icon
+            ctx.fillText("LIVES: " + lives, livesStartX, 30);
+        }
+
+        // === LEVEL INFO ===
+        String levelText = "LEVEL " + levelManager.getCurrentLevel();
         ctx.fillText(levelText, Config.SCREEN_WIDTH/2 - 40, 30);
 
-        // Bricks remaining
-        String bricksText = "BRICKS: " + levelManager.getRemainingBricks() + "/" + levelManager.getTotalBricks();
-        ctx.fillText(bricksText, Config.SCREEN_WIDTH/2 - 40, 50);
+        // === SOUND với icon ===
+        double soundX = Config.SCREEN_WIDTH - 120;
+        boolean isSoundOn = soundManager.isSoundEnabled();
 
-        // Sound status
-        String soundStatus = soundManager.isSoundEnabled() ? "ON" : "OFF";
-        Color soundColor = soundManager.isSoundEnabled() ? Color.GREEN : Color.RED;
-        ctx.setFill(soundColor);
-        ctx.fillText("SOUND: " + soundStatus, Config.SCREEN_WIDTH - 120, 50);
-        ctx.setFill(Color.WHITE);
-        ctx.fillText("Press M to toggle", Config.SCREEN_WIDTH - 150, 65);
+        if ((isSoundOn && soundOnIcon != null) || (!isSoundOn && soundOffIcon != null)) {
+            Image soundIcon = isSoundOn ? soundOnIcon : soundOffIcon;
+            ctx.drawImage(soundIcon, soundX, 35, iconSize, iconSize);
 
-        // Mouse control status
-        String mouseControlStatus = mouseControlEnabled ? "MOUSE CONTROL: ON" : "MOUSE CONTROL: OFF";
-        Color mouseColor = mouseControlEnabled ? Color.GREEN : Color.YELLOW;
-        ctx.setFill(mouseColor);
-        ctx.fillText(mouseControlStatus, Config.SCREEN_WIDTH/2 - 70, 70);
+            // Vẽ text "Press M" bên cạnh icon
+            ctx.setFill(Color.LIGHTGRAY);
+            ctx.setFont(Font.font(12));
+            ctx.fillText("Press M", soundX + textOffset, 50);
+            ctx.setFont(Font.font(16)); // Reset font size
+        } else {
+            // Fallback: vẽ text như cũ
+            String soundStatus = isSoundOn ? "ON" : "OFF";
+            Color soundColor = isSoundOn ? Color.GREEN : Color.RED;
+            ctx.setFill(soundColor);
+            ctx.fillText("SOUND: " + soundStatus, soundX, 50);
+            ctx.setFill(Color.WHITE);
+            ctx.fillText("Press M to toggle", soundX, 65);
+        }
 
-        // Game over message
+        // === MOUSE CONTROL với icon ===
+        double mouseControlX = Config.SCREEN_WIDTH - 120;
+        double mouseControlY = 60;
+
+        if ((mouseControlEnabled && mouseOnIcon != null) || (!mouseControlEnabled && mouseOffIcon != null)) {
+            Image mouseIcon = mouseControlEnabled ? mouseOnIcon : mouseOffIcon;
+            ctx.drawImage(mouseIcon, mouseControlX, mouseControlY, iconSize, iconSize);
+
+            // Vẽ text "Press C" bên cạnh icon
+            ctx.setFill(Color.LIGHTGRAY);
+            ctx.setFont(Font.font(12));
+            ctx.fillText("Press C", mouseControlX + textOffset, mouseControlY + 15);
+            ctx.setFont(Font.font(16)); // Reset font size
+        } else {
+            // Fallback: vẽ text như cũ
+            String mouseControlStatus = mouseControlEnabled ? "MOUSE CONTROL: ON" : "MOUSE CONTROL: OFF";
+            Color mouseColor = mouseControlEnabled ? Color.GREEN : Color.YELLOW;
+            ctx.setFill(mouseColor);
+            ctx.fillText(mouseControlStatus, Config.SCREEN_WIDTH/2 - 70, 70);
+        }
+
+        // === GAME OVER MESSAGE ===
         if (lives <= 0) {
             ctx.setFill(Color.RED);
             ctx.setFont(Font.font(32));
             ctx.fillText("GAME OVER", Config.SCREEN_WIDTH/2 - 80, Config.SCREEN_HEIGHT/2);
+            ctx.setFont(Font.font(16)); // Reset font size
         }
 
-        // Level complete message
+        // === LEVEL COMPLETE MESSAGE ===
         if (levelManager.isLevelCompleted() && levelManager.hasNextLevel()) {
             ctx.setFill(Color.GREEN);
             ctx.setFont(Font.font(24));
             ctx.fillText("LEVEL COMPLETE!", Config.SCREEN_WIDTH/2 - 80, Config.SCREEN_HEIGHT/2 - 30);
             ctx.fillText("GET READY FOR NEXT LEVEL", Config.SCREEN_WIDTH/2 - 120, Config.SCREEN_HEIGHT/2 + 10);
+            ctx.setFont(Font.font(16)); // Reset font size
         }
     }
 
@@ -796,11 +852,44 @@ public class GameScene extends SceneManager {
             powerupExtraliveImage = spriteLoader.loadSprite("/images/powerup/extralive.png");
             powerupPierceballImage = spriteLoader.loadSprite("/images/powerup/pierceball.png");
 
+            heartIcon = spriteLoader.loadSprite("/images/icons/heart.png", 20, 20, true, true);
+            soundOnIcon = spriteLoader.loadSprite("/images/icons/sound_on.png", 20, 20, true, true);
+            soundOffIcon = spriteLoader.loadSprite("/images/icons/sound_off.png", 20, 20, true, true);
+            mouseOnIcon = spriteLoader.loadSprite("/images/icons/mouse_on.png", 20, 20, true, true);
+            mouseOffIcon = spriteLoader.loadSprite("/images/icons/mouse_off.png", 20, 20, true, true);
+
             System.out.println("Game sprites loaded successfully");
 
         } catch (Exception e) {
             System.err.println("Error loading game sprites: " + e.getMessage());
+
+            // Tạo fallback icons nếu không load được ảnh
+            createFallbackIcons();
         }
+    }
+
+    // Phương thức tạo icons thay thế nếu không load được ảnh
+    private void createFallbackIcons() {
+        // Tạo icon trái tim đơn giản
+        heartIcon = createColoredIcon(20, 20, Color.RED);
+        soundOnIcon = createColoredIcon(20, 20, Color.GREEN);
+        soundOffIcon = createColoredIcon(20, 20, Color.RED);
+
+        // THÊM ICON MOUSE CONTROL FALLBACK
+        mouseOnIcon = createColoredIcon(20, 20, Color.GREEN);
+        mouseOffIcon = createColoredIcon(20, 20, Color.YELLOW);
+    }
+
+    private Image createColoredIcon(int width, int height, Color color) {
+        WritableImage image = new WritableImage(width, height);
+        PixelWriter pixelWriter = image.getPixelWriter();
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                pixelWriter.setColor(x, y, color);
+            }
+        }
+        return image;
     }
 
     // === GETTERS ===
