@@ -4,7 +4,9 @@ import Engine.SceneManager;
 import Utils.Config;
 import Utils.SaveManager;
 import Utils.SoundManager;
+import Utils.SpriteLoader;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
@@ -17,6 +19,9 @@ public class HighscoreScene extends SceneManager {
     private GraphicsContext ctx;
     private SoundManager soundManager;
     private SaveManager saveManager;
+    private SpriteLoader spriteLoader;
+    private Image backgroundImage;
+
     private List<SaveManager.HighscoreEntry> highscores;
     private Runnable returnCallback;
 
@@ -24,52 +29,52 @@ public class HighscoreScene extends SceneManager {
         this.ctx = ctx;
         this.soundManager = SoundManager.getInstance();
         this.saveManager = SaveManager.getInstance();
+        this.spriteLoader = SpriteLoader.getInstance();
         this.returnCallback = returnCallback;
-        // KHÔNG load highscores ở constructor, sẽ load mới mỗi lần start()
+
+        loadBackground();
     }
 
-    @Override
-    public void start() {
-        // LUÔN load highscores mới nhất mỗi khi scene được bắt đầu
-        this.highscores = saveManager.getHighscores();
-        System.out.println("Highscore Scene started - Loaded " + highscores.size() + " highscores");
-
-        // Debug: in ra tất cả highscores để kiểm tra
-        for (int i = 0; i < highscores.size(); i++) {
-            SaveManager.HighscoreEntry entry = highscores.get(i);
-            System.out.println("Highscore " + (i+1) + ": " + entry.getPlayerName() + " - " + entry.getScore() + " - Level " + entry.getLevel());
+    private void loadBackground() {
+        String path = "/images/backgrounds/highscore_bg.png";
+        backgroundImage = spriteLoader.loadSprite(path, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT, true, false);
+        if (backgroundImage == null || backgroundImage.isError()) {
+            System.err.println("⚠️ HighscoreScene background not found: " + path + ". Using gradient fallback.");
+            backgroundImage = null;
+        } else {
+            System.out.println("✅ HighscoreScene background loaded: " + path);
         }
     }
 
     @Override
-    public void update(double deltaTime) {
-        // Không cần update thường xuyên
+    public void start() {
+        // LUÔN load highscores mới nhất
+        this.highscores = saveManager.getHighscores();
+        System.out.println("Highscore Scene started - Loaded " + highscores.size() + " highscores");
     }
 
     @Override
+    public void update(double deltaTime) { }
+
+    @Override
     public void render() {
-        // Nền gradient đẹp hơn
-        drawGradientBackground();
-
-        // Tiêu đề
+        drawBackground();
         drawTitle();
-
-        // Header bảng
         drawTableHeader();
-
-        // Vẽ các highscore
         drawHighscores();
-
-        // Hướng dẫn
         drawInstructions();
     }
 
-    private void drawGradientBackground() {
-        for (int i = 0; i < Config.SCREEN_HEIGHT; i++) {
-            double progress = (double) i / Config.SCREEN_HEIGHT;
-            Color color = Color.hsb(240, 0.8, 0.1 + progress * 0.3);
-            ctx.setFill(color);
-            ctx.fillRect(0, i, Config.SCREEN_WIDTH, 1);
+    private void drawBackground() {
+        if (backgroundImage != null) {
+            ctx.drawImage(backgroundImage, 0, 0, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
+        } else {
+            for (int i = 0; i < Config.SCREEN_HEIGHT; i++) {
+                double progress = (double) i / Config.SCREEN_HEIGHT;
+                Color color = Color.hsb(240, 0.8, 0.1 + progress * 0.3);
+                ctx.setFill(color);
+                ctx.fillRect(0, i, Config.SCREEN_WIDTH, 1);
+            }
         }
     }
 
@@ -87,7 +92,6 @@ public class HighscoreScene extends SceneManager {
         ctx.fillText("SCORE", 350, 120);
         ctx.fillText("LEVEL", 450, 120);
 
-        // Đường kẻ ngang dưới header
         ctx.setStroke(Color.WHITE);
         ctx.setLineWidth(1);
         ctx.strokeLine(80, 130, 520, 130);
@@ -105,20 +109,13 @@ public class HighscoreScene extends SceneManager {
         for (int i = 0; i < highscores.size(); i++) {
             SaveManager.HighscoreEntry entry = highscores.get(i);
 
-            // Màu sắc khác nhau cho top 3
-            if (i == 0) {
-                ctx.setFill(Color.GOLD);
-                ctx.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-            } else if (i == 1) {
-                ctx.setFill(Color.SILVER);
-                ctx.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-            } else if (i == 2) {
-                ctx.setFill(Color.ORANGE);
-                ctx.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-            } else {
-                ctx.setFill(Color.WHITE);
-                ctx.setFont(Font.font("Arial", 18));
-            }
+            if (i == 0) ctx.setFill(Color.GOLD);
+            else if (i == 1) ctx.setFill(Color.SILVER);
+            else if (i == 2) ctx.setFill(Color.ORANGE);
+            else ctx.setFill(Color.WHITE);
+
+            FontWeight weight = (i <= 2) ? FontWeight.BOLD : FontWeight.NORMAL;
+            ctx.setFont(Font.font("Arial", weight, (i <= 2) ? 20 : 18));
 
             int y = 160 + i * 30;
             ctx.fillText((i + 1) + ".", 100, y);

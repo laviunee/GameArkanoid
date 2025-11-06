@@ -59,7 +59,7 @@ public class SoundManager {
             loadSoundEffect("win", "/sounds/win.wav");
             loadSoundEffect("paddle_hit", "/sounds/paddle_hit.wav");
             loadSoundEffect("game_start", "/sounds/game_start.wav");
-            loadSoundEffect("lose_life", "/sounds/lose1.wav");
+            loadSoundEffect("lose_life", "/sounds/lose.wav");
 
 
             // Load music

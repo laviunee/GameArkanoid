@@ -3,20 +3,21 @@ package UI;
 import Engine.SceneManager;
 import Utils.Config;
 import Utils.SoundManager;
+import Utils.SpriteLoader;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
-/**
- * GameOverScene - Cảnh kết thúc game
- */
 public class GameOverScene extends SceneManager {
     private GraphicsContext ctx;
     private Runnable onRestartGame;
     private Runnable onReturnToMenu;
     private SoundManager soundManager;
+    private SpriteLoader spriteLoader;
+    private Image backgroundImage;
 
     private boolean isActive;
     private int selectedOption;
@@ -41,8 +42,10 @@ public class GameOverScene extends SceneManager {
         this.onRestartGame = onRestartGame;
         this.onReturnToMenu = onReturnToMenu;
         this.soundManager = SoundManager.getInstance();
+        this.spriteLoader = SpriteLoader.getInstance();
 
         initializeFonts();
+        loadBackground();
     }
 
     private void initializeFonts() {
@@ -52,20 +55,35 @@ public class GameOverScene extends SceneManager {
         this.infoFont = Font.font("Arial", 16);
     }
 
+    private void loadBackground() {
+        String[] paths = {
+                "/images/backgrounds/gameover_bg.png",
+                "images/backgrounds/gameover_bg.png"
+        };
+
+        for (String path : paths) {
+            backgroundImage = spriteLoader.loadSprite(path, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT, true, false);
+            if (backgroundImage != null && !backgroundImage.isError()) {
+                System.out.println("✅ GameOverScene background loaded: " + path);
+                return;
+            }
+        }
+
+        System.err.println("⚠️ GameOverScene background not found. Using gradient overlay.");
+        backgroundImage = null;
+    }
+
     @Override
     public void start() {
         isActive = true;
         selectedOption = 0;
         pulseValue = 0;
         lastUpdateTime = System.currentTimeMillis();
-
-        // Play game over sound
         soundManager.playSound("gameover");
     }
 
     @Override
     public void update(double deltaTime) {
-        // Update animation
         long currentTime = System.currentTimeMillis();
         pulseValue = Math.sin(currentTime * 0.005) * 0.3 + 0.7;
         lastUpdateTime = currentTime;
@@ -73,8 +91,25 @@ public class GameOverScene extends SceneManager {
 
     @Override
     public void render() {
-        drawOverlay();
+        drawBackground();
         drawGameOverMenu();
+    }
+
+    private void drawBackground() {
+        if (backgroundImage != null) {
+            ctx.drawImage(backgroundImage, 0, 0, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
+        } else {
+            // Gradient background fallback
+            for (int i = 0; i < Config.SCREEN_HEIGHT; i += 2) {
+                double progress = (double) i / Config.SCREEN_HEIGHT;
+                Color color = Color.hsb(0, 0.8, 0.1 + progress * 0.2);
+                ctx.setFill(color);
+                ctx.fillRect(0, i, Config.SCREEN_WIDTH, 2);
+            }
+            // Dark overlay
+            ctx.setFill(Color.rgb(0, 0, 0, 0.7));
+            ctx.fillRect(0, 0, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
+        }
     }
 
     @Override
@@ -82,49 +117,16 @@ public class GameOverScene extends SceneManager {
         if (!isActive) return;
 
         if (event.getEventType() == KeyEvent.KEY_PRESSED) {
-            handleKeyPress(event);
-        }
-    }
-
-    @Override
-    public void cleanup() {
-        isActive = false;
-    }
-
-    private void handleKeyPress(KeyEvent event) {
-        switch (event.getCode()) {
-            case A, UP, W -> {
-                moveSelectionUp();
-                soundManager.playSound("hit");
+            switch (event.getCode()) {
+                case A, UP, W -> { selectedOption = (selectedOption - 1 + gameOverOptions.length) % gameOverOptions.length; soundManager.playSound("hit"); }
+                case D, DOWN, S -> { selectedOption = (selectedOption + 1) % gameOverOptions.length; soundManager.playSound("hit"); }
+                case ENTER, SPACE -> {
+                    if (selectedOption == 0) restartGame();
+                    else returnToMenu();
+                    soundManager.playSound("powerup");
+                }
+                case M -> toggleSound();
             }
-            case D, DOWN, S -> {
-                moveSelectionDown();
-                soundManager.playSound("hit");
-            }
-            case ENTER, SPACE -> {
-                selectOption();
-                soundManager.playSound("powerup");
-            }
-            case M -> toggleSound();
-        }
-    }
-
-    private void moveSelectionUp() {
-        selectedOption = (selectedOption - 1 + gameOverOptions.length) % gameOverOptions.length;
-    }
-
-    private void moveSelectionDown() {
-        selectedOption = (selectedOption + 1) % gameOverOptions.length;
-    }
-
-    private void selectOption() {
-        switch (selectedOption) {
-            case 0: // PLAY AGAIN
-                restartGame();
-                break;
-            case 1: // MAIN MENU
-                returnToMenu();
-                break;
         }
     }
 
@@ -143,68 +145,47 @@ public class GameOverScene extends SceneManager {
     }
 
     private void toggleSound() {
-        boolean newState = !soundManager.isSoundEnabled();
-        soundManager.setSoundEnabled(newState);
-    }
-
-    private void drawOverlay() {
-        // Gradient background
-        for (int i = 0; i < Config.SCREEN_HEIGHT; i += 2) {
-            double progress = (double) i / Config.SCREEN_HEIGHT;
-            Color color = Color.hsb(0, 0.8, 0.1 + progress * 0.2);
-            ctx.setFill(color);
-            ctx.fillRect(0, i, Config.SCREEN_WIDTH, 2);
-        }
-
-        // Dark overlay
-        ctx.setFill(Color.rgb(0, 0, 0, 0.7));
-        ctx.fillRect(0, 0, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
+        soundManager.setSoundEnabled(!soundManager.isSoundEnabled());
     }
 
     private void drawGameOverMenu() {
-        // Lưu alignment hiện tại
         TextAlignment originalAlignment = ctx.getTextAlign();
-
-        // Căn giữa tất cả
         ctx.setTextAlign(TextAlignment.CENTER);
         double centerX = Config.SCREEN_WIDTH / 2;
 
-        // Tiêu đề với hiệu ứng pulse
+        // Title
         ctx.setFont(titleFont);
         ctx.setFill(Color.rgb(255, 50, 50, pulseValue));
         ctx.fillText("GAME OVER", centerX, 150);
 
-        // Thông tin điểm số
+        // Score & level
         ctx.setFont(scoreFont);
         ctx.setFill(Color.YELLOW);
         ctx.fillText("FINAL SCORE: " + finalScore, centerX, 220);
-
         ctx.setFill(Color.CYAN);
         ctx.fillText("LEVEL REACHED: " + finalLevel, centerX, 260);
 
-        // Vẽ các tùy chọn
+        // Options
         ctx.setFont(optionFont);
         for (int i = 0; i < gameOverOptions.length; i++) {
-            if (i == selectedOption) {
-                ctx.setFill(Color.CYAN);
-                ctx.fillText("> " + gameOverOptions[i] + " <",
-                        centerX, 320 + i * 50);
-            } else {
-                ctx.setFill(Color.WHITE);
-                ctx.fillText(gameOverOptions[i],
-                        centerX, 320 + i * 50);
-            }
+            if (i == selectedOption) ctx.setFill(Color.CYAN);
+            else ctx.setFill(Color.WHITE);
+            ctx.fillText(i == selectedOption ? "> " + gameOverOptions[i] + " <" : gameOverOptions[i], centerX, 320 + i * 50);
         }
 
-        // Hướng dẫn
+        // Instructions
         ctx.setFont(infoFont);
         ctx.setFill(Color.LIGHTGRAY);
         ctx.fillText("USE ↑↓ TO NAVIGATE", centerX, 450);
         ctx.fillText("PRESS ENTER TO SELECT", centerX, 475);
         ctx.fillText("PRESS M TO TOGGLE SOUND", centerX, 500);
 
-        // Reset về alignment ban đầu
         ctx.setTextAlign(originalAlignment);
+    }
+
+    @Override
+    public void cleanup() {
+        isActive = false;
     }
 
     public boolean isActive() { return isActive; }
