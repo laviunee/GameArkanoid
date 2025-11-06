@@ -22,6 +22,9 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 
 import java.util.ArrayList;
@@ -193,6 +196,7 @@ public class GameScene extends SceneManager {
     @Override
     public void render() {
         drawBackground();
+        drawHUDBackground();
         drawBricks();
         drawPowerUps();
         drawPaddle();
@@ -543,6 +547,68 @@ public class GameScene extends SceneManager {
         ctx.fillRect(0, Config.UPPER_INSET, Config.INSET, Config.SCREEN_HEIGHT - Config.UPPER_INSET);
         ctx.fillRect(Config.SCREEN_WIDTH - Config.INSET, Config.UPPER_INSET, Config.INSET, Config.SCREEN_HEIGHT - Config.UPPER_INSET);
     }
+
+    private void drawHUDBackground() {
+        double hudHeight = 80;
+        int level = levelManager.getCurrentLevel(); // 1-based
+        Color startColor, midColor, endColor, borderColor, shadowColor;
+
+        // Chọn màu theo level
+        switch (level) {
+            case 1, 3, 4 -> {
+                startColor = Color.rgb(0, 20, 50, 0.7);
+                midColor = Color.rgb(0, 80, 150, 0.85);
+                endColor = Color.rgb(0, 20, 50, 0.7);
+                borderColor = Color.rgb(200, 220, 255, 0.15);
+                shadowColor = Color.rgb(0, 0, 0, 0.2);
+            }
+            case 2 -> {
+                startColor = Color.rgb(10, 10, 30, 0.7);
+                midColor = Color.rgb(50, 0, 80, 0.85);
+                endColor = Color.rgb(10, 10, 30, 0.7);
+                borderColor = Color.rgb(255, 255, 255, 0.15);
+                shadowColor = Color.rgb(0, 0, 0, 0.2);
+            }
+            case 5 -> { // Final / Magenta
+                startColor = Color.rgb(50, 0, 50, 0.7);
+                midColor = Color.rgb(200, 0, 150, 0.85);
+                endColor = Color.rgb(50, 0, 50, 0.7);
+                borderColor = Color.rgb(255, 150, 255, 0.15);
+                shadowColor = Color.rgb(0, 0, 0, 0.2);
+            }
+            default -> { // fallback
+                startColor = Color.rgb(0, 0, 0, 0.7);
+                midColor = Color.rgb(30, 30, 50, 0.85);
+                endColor = Color.rgb(0, 0, 0, 0.7);
+                borderColor = Color.rgb(255, 255, 255, 0.15);
+                shadowColor = Color.rgb(0, 0, 0, 0.2);
+            }
+        }
+
+        // Gradient thanh HUD
+        LinearGradient gradient = new LinearGradient(
+                0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0, startColor),
+                new Stop(0.5, midColor),
+                new Stop(1, endColor)
+        );
+
+        ctx.setFill(gradient);
+        ctx.fillRoundRect(0, 0, Config.SCREEN_WIDTH, hudHeight, 15, 15);
+
+        // Viền thanh HUD
+        ctx.setStroke(borderColor);
+        ctx.setLineWidth(2);
+        ctx.strokeRoundRect(1, 1, Config.SCREEN_WIDTH - 2, hudHeight - 2, 15, 15);
+
+        // Shadow nhẹ ở đáy
+        ctx.setStroke(shadowColor);
+        ctx.setLineWidth(3);
+        ctx.strokeLine(0, hudHeight - 1, Config.SCREEN_WIDTH, hudHeight - 1);
+    }
+
+
+
 
     private void drawBricks() {
         for (Brick brick : levelManager.getBricks()) {

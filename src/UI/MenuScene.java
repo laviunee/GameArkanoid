@@ -8,6 +8,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
@@ -78,7 +81,7 @@ public class MenuScene extends SceneManager {
     private void loadFontsFromResources() {
         try {
             // 🎯 CHỈ LOAD TITLE FONT TỪ FILE
-            InputStream titleFontStream = getClass().getResourceAsStream("/fonts/Title.ttf");
+            InputStream titleFontStream = getClass().getResourceAsStream("/fonts/MomoTrustDisplay-Regular.ttf");
             if (titleFontStream != null) {
                 titleFont = Font.loadFont(titleFontStream, 80);
                 titleFontStream.close();
@@ -203,13 +206,21 @@ public class MenuScene extends SceneManager {
         } else {
             double pulse = Math.sin(titlePulse) * 5;
 
-            // 🎯 TITLE DÙNG FONT LOAD TỪ FILE
             ctx.setFont(titleFont);
-            ctx.setFill(Color.PLUM); // tím
-            ctx.setStroke(Color.WHITE);
-            ctx.setLineWidth(3);
+
+
+            // 🎯 TITLE DÙNG FONT LOAD TỪ FILE
+            LinearGradient gradient = new LinearGradient(
+                    0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
+                    new Stop(0, Color.web("#FF00FF")), // Hồng neon
+                    new Stop(1, Color.web("#00FFFF"))  // Xanh neon
+            );
+            ctx.setFill(gradient);
+            ctx.setStroke(Color.web("#FFFFFF")); // Viền trắng nhẹ
+            ctx.setLineWidth(2.5);
             ctx.strokeText("ARKANOID", Config.SCREEN_WIDTH / 2 - 185, 125 + titleYOffset + pulse);
             ctx.fillText("ARKANOID", Config.SCREEN_WIDTH / 2 - 185, 125 + titleYOffset + pulse);
+
         }
     }
 
