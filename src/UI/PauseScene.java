@@ -152,7 +152,7 @@ public class PauseScene extends SceneManager {
         for (int i = 0; i < pauseOptions.length; i++) {
             if (i == selectedOption) {
                 ctx.setFill(Color.CYAN);
-                ctx.fillText("> " + pauseOptions[i] + " <", centerX, 280 + i * 50);
+                ctx.fillText("➤ " + pauseOptions[i], centerX, 280 + i * 50);
             } else {
                 ctx.setFill(Color.WHITE);
                 ctx.fillText(pauseOptions[i], centerX, 280 + i * 50);

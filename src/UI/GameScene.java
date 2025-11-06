@@ -28,6 +28,7 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.image.PixelWriter;
+import javafx.scene.text.FontWeight;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -731,97 +732,71 @@ public class GameScene extends SceneManager {
     }
 
     private void drawUI() {
+        double hudHeight = 80;
+        ctx.setFont(Font.font("Arial", 20)); // chữ to hơn
         ctx.setFill(Color.WHITE);
-        ctx.setFont(Font.font(16));
+        ctx.setStroke(Color.BLACK);
+        ctx.setLineWidth(1.5);
 
-        int iconSize = 20;
+        int iconSize = 24;
         int iconSpacing = 5;
-        int textOffset = iconSize + iconSpacing;
 
         // === SCORE ===
-        ctx.fillText("SCORE: " + score, 20, 30);
+        String scoreText = "SCORE: " + score;
+        ctx.strokeText(scoreText, 20, 30);
+        ctx.fillText(scoreText, 20, 30);
 
-        // === LIVES: CHỈ HIỂN THỊ TRÁI TIM, KHÔNG CÓ SỐ ===
-        double livesStartX = Config.SCREEN_WIDTH - 150;
-        double livesY = 15;
-
-        if (heartIcon != null) {
-            // Vẽ từng trái tim tương ứng với số mạng
-            for (int i = 0; i < lives; i++) {
-                double heartX = livesStartX + (i * (iconSize + 5)); // Mỗi trái tim cách nhau 5px
-                ctx.drawImage(heartIcon, heartX, livesY, iconSize, iconSize);
-            }
-            // ĐÃ XÓA DÒNG HIỂN THỊ SỐ "× " + lives
-        } else {
-            // Fallback: vẽ text như cũ nếu không có icon
-            ctx.fillText("LIVES: " + lives, livesStartX, 30);
-        }
-
-        // === LEVEL INFO ===
+        // === LEVEL text (bigger + simple gradient) ===
         String levelText = "LEVEL " + levelManager.getCurrentLevel();
-        ctx.fillText(levelText, Config.SCREEN_WIDTH/2 - 40, 30);
 
-        // === SOUND với icon ===
-        double soundX = Config.SCREEN_WIDTH - 120;
+// Font to hơn, đậm rõ
+        ctx.setFont(Font.font("Impact", FontWeight.BOLD, 40));
+
+        LinearGradient gradient = new LinearGradient(
+                0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.web("#008B8B")), // Xanh cyan đậm
+                new Stop(1, Color.web("#4B0082"))  // Tím Indigo
+        );
+        ctx.setFill(gradient);
+        ctx.setStroke(Color.web("#E0E0E0"));
+        ctx.setLineWidth(2);
+
+
+// Căn giữa như cũ
+        double levelTextWidth = ctx.getFont().getSize() * levelText.length() * 0.35;
+        double levelX = Config.SCREEN_WIDTH / 2 - levelTextWidth / 2;
+
+// Vẽ
+        ctx.strokeText(levelText, levelX, 53);
+        ctx.fillText(levelText, levelX, 53);
+
+
+        // === LIVES (icon heart) ===
+        if (heartIcon != null) {
+            for (int i = 0; i < lives; i++) {
+                double heartX = 20 + i * (iconSize + 5);
+                ctx.drawImage(heartIcon, heartX, 45, iconSize, iconSize);
+            }
+        } else {
+            String livesText = "LIVES: " + lives;
+            ctx.strokeText(livesText, 20, 30);
+            ctx.fillText(livesText, 20, 30);
+        }
+
+        // === SOUND ICON ===
         boolean isSoundOn = soundManager.isSoundEnabled();
-
-        if ((isSoundOn && soundOnIcon != null) || (!isSoundOn && soundOffIcon != null)) {
-            Image soundIcon = isSoundOn ? soundOnIcon : soundOffIcon;
-            ctx.drawImage(soundIcon, soundX, 35, iconSize, iconSize);
-
-            // Vẽ text "Press M" bên cạnh icon
-            ctx.setFill(Color.LIGHTGRAY);
-            ctx.setFont(Font.font(12));
-            ctx.fillText("Press M", soundX + textOffset, 50);
-            ctx.setFont(Font.font(16)); // Reset font size
-        } else {
-            // Fallback: vẽ text như cũ
-            String soundStatus = isSoundOn ? "ON" : "OFF";
-            Color soundColor = isSoundOn ? Color.GREEN : Color.RED;
-            ctx.setFill(soundColor);
-            ctx.fillText("SOUND: " + soundStatus, soundX, 50);
-            ctx.setFill(Color.WHITE);
-            ctx.fillText("Press M to toggle", soundX, 65);
+        Image soundIcon = isSoundOn ? soundOnIcon : soundOffIcon;
+        if (soundIcon != null) {
+            ctx.drawImage(soundIcon, 650, 15, iconSize, iconSize);
         }
 
-        // === MOUSE CONTROL với icon ===
-        double mouseControlX = Config.SCREEN_WIDTH - 120;
-        double mouseControlY = 60;
-
-        if ((mouseControlEnabled && mouseOnIcon != null) || (!mouseControlEnabled && mouseOffIcon != null)) {
-            Image mouseIcon = mouseControlEnabled ? mouseOnIcon : mouseOffIcon;
-            ctx.drawImage(mouseIcon, mouseControlX, mouseControlY, iconSize, iconSize);
-
-            // Vẽ text "Press C" bên cạnh icon
-            ctx.setFill(Color.LIGHTGRAY);
-            ctx.setFont(Font.font(12));
-            ctx.fillText("Press C", mouseControlX + textOffset, mouseControlY + 15);
-            ctx.setFont(Font.font(16)); // Reset font size
-        } else {
-            // Fallback: vẽ text như cũ
-            String mouseControlStatus = mouseControlEnabled ? "MOUSE CONTROL: ON" : "MOUSE CONTROL: OFF";
-            Color mouseColor = mouseControlEnabled ? Color.GREEN : Color.YELLOW;
-            ctx.setFill(mouseColor);
-            ctx.fillText(mouseControlStatus, Config.SCREEN_WIDTH/2 - 70, 70);
-        }
-
-        // === GAME OVER MESSAGE ===
-        if (lives <= 0) {
-            ctx.setFill(Color.RED);
-            ctx.setFont(Font.font(32));
-            ctx.fillText("GAME OVER", Config.SCREEN_WIDTH/2 - 80, Config.SCREEN_HEIGHT/2);
-            ctx.setFont(Font.font(16)); // Reset font size
-        }
-
-        // === LEVEL COMPLETE MESSAGE ===
-        if (levelManager.isLevelCompleted() && levelManager.hasNextLevel()) {
-            ctx.setFill(Color.GREEN);
-            ctx.setFont(Font.font(24));
-            ctx.fillText("LEVEL COMPLETE!", Config.SCREEN_WIDTH/2 - 80, Config.SCREEN_HEIGHT/2 - 30);
-            ctx.fillText("GET READY FOR NEXT LEVEL", Config.SCREEN_WIDTH/2 - 120, Config.SCREEN_HEIGHT/2 + 10);
-            ctx.setFont(Font.font(16)); // Reset font size
+        // === MOUSE ICON ===
+        Image mouseIcon = mouseControlEnabled ? mouseOnIcon : mouseOffIcon;
+        if (mouseIcon != null) {
+            ctx.drawImage(mouseIcon, 650, 45, iconSize, iconSize);
         }
     }
+
 
     // === EVENT HANDLERS ===
     private void handleGameOver() {

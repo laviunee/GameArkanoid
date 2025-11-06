@@ -198,31 +198,31 @@ public class MenuScene extends SceneManager {
     }
 
     private void drawTitle() {
-        if (titleImage != null && !titleImage.isError()) {
-            double pulse = Math.sin(titlePulse) * 5;
-            double x = Config.SCREEN_WIDTH / 2 - titleImage.getWidth() / 2;
-            double y = 100 + titleYOffset + pulse;
-            ctx.drawImage(titleImage, x, y);
-        } else {
-            double pulse = Math.sin(titlePulse) * 5;
+        double pulse = Math.sin(titlePulse) * 5;
+        ctx.setFont(titleFont);
 
-            ctx.setFont(titleFont);
+        // Gradient & stroke
+        LinearGradient gradient = new LinearGradient(
+                0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.web("#FF00FF")), // Hồng neon
+                new Stop(1, Color.web("#00FFFF"))  // Xanh neon
+        );
+        ctx.setFill(gradient);
+        ctx.setStroke(Color.web("#FFFFFF"));
+        ctx.setLineWidth(2.5);
 
+        // Tạo Text object để đo width
+        javafx.scene.text.Text text = new javafx.scene.text.Text("ARKANOID");
+        text.setFont(titleFont);
+        double textWidth = text.getLayoutBounds().getWidth();
 
-            // 🎯 TITLE DÙNG FONT LOAD TỪ FILE
-            LinearGradient gradient = new LinearGradient(
-                    0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
-                    new Stop(0, Color.web("#FF00FF")), // Hồng neon
-                    new Stop(1, Color.web("#00FFFF"))  // Xanh neon
-            );
-            ctx.setFill(gradient);
-            ctx.setStroke(Color.web("#FFFFFF")); // Viền trắng nhẹ
-            ctx.setLineWidth(2.5);
-            ctx.strokeText("ARKANOID", Config.SCREEN_WIDTH / 2 - 185, 125 + titleYOffset + pulse);
-            ctx.fillText("ARKANOID", Config.SCREEN_WIDTH / 2 - 185, 125 + titleYOffset + pulse);
+        double x = (Config.SCREEN_WIDTH - textWidth) / 2;
+        double y = 180 + titleYOffset + pulse;
 
-        }
+        ctx.strokeText("ARKANOID", x, y);
+        ctx.fillText("ARKANOID", x, y);
     }
+
 
     private void drawMainMenuOptions() {
         // 🎯 OPTIONS DÙNG FONT HỆ THỐNG
@@ -230,7 +230,7 @@ public class MenuScene extends SceneManager {
         String[] options = getCurrentOptions();
 
         // Điều chỉnh vị trí để fit thêm option
-        int startY = 380;
+        int startY = 335;
         int optionSpacing = 50;
 
         for (int i = 0; i < options.length; i++) {
@@ -254,15 +254,6 @@ public class MenuScene extends SceneManager {
     }
 
     private void drawInstructionContent() {
-        // 🎯 INSTRUCTION TITLE DÙNG FONT HỆ THỐNG
-        ctx.setFont(optionFont);
-        ctx.setFill(Color.YELLOW);
-        ctx.setStroke(Color.ORANGE);
-        ctx.setLineWidth(2);
-        ctx.strokeText("HOW TO PLAY", Config.SCREEN_WIDTH / 2 - 140, 370);
-        ctx.fillText("HOW TO PLAY", Config.SCREEN_WIDTH / 2 - 140, 370);
-
-        // 🎯 INSTRUCTION CONTENT DÙNG FONT HỆ THỐNG
         ctx.setFont(infoFont);
         ctx.setFill(Color.WHITE);
 
@@ -281,12 +272,11 @@ public class MenuScene extends SceneManager {
         };
 
         for (int i = 0; i < instructions.length; i++) {
-            ctx.fillText(instructions[i], Config.SCREEN_WIDTH / 2 - 200, 420 + i * 25);
+            ctx.fillText(instructions[i], Config.SCREEN_WIDTH / 2 - 200, 320 + i * 25);
         }
     }
 
     private void drawHowToPlayInstructions() {
-        // 🎯 INSTRUCTIONS DÙNG FONT HỆ THỐNG
         ctx.setFont(infoFont);
         ctx.setFill(Color.LIGHTGRAY);
         ctx.fillText("PRESS ENTER TO RETURN", Config.SCREEN_WIDTH / 2 - 120, 700);
@@ -299,15 +289,6 @@ public class MenuScene extends SceneManager {
     }
 
     private void drawCredits() {
-        // 🎯 CREDITS TITLE DÙNG FONT HỆ THỐNG
-        ctx.setFont(optionFont);
-        ctx.setFill(Color.YELLOW);
-        ctx.setStroke(Color.ORANGE);
-        ctx.setLineWidth(2);
-        ctx.strokeText("CREDITS", Config.SCREEN_WIDTH / 2 - 60, 400);
-        ctx.fillText("CREDITS", Config.SCREEN_WIDTH / 2 - 60, 400);
-
-        // 🎯 CREDITS CONTENT DÙNG FONT HỆ THỐNG
         ctx.setFont(creditsFont);
         ctx.setFill(Color.WHITE);
         String[] credits = {
@@ -321,7 +302,7 @@ public class MenuScene extends SceneManager {
         };
 
         for (int i = 0; i < credits.length; i++) {
-            ctx.fillText(credits[i], Config.SCREEN_WIDTH / 2 - 100, 450 + i * 30);
+            ctx.fillText(credits[i], Config.SCREEN_WIDTH / 2 - 100, 350 + i * 30);
         }
     }
 

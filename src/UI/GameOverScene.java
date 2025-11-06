@@ -170,7 +170,7 @@ public class GameOverScene extends SceneManager {
         for (int i = 0; i < gameOverOptions.length; i++) {
             if (i == selectedOption) ctx.setFill(Color.CYAN);
             else ctx.setFill(Color.WHITE);
-            ctx.fillText(i == selectedOption ? "> " + gameOverOptions[i] + " <" : gameOverOptions[i], centerX, 320 + i * 50);
+            ctx.fillText(i == selectedOption ? "➤ " + gameOverOptions[i] : gameOverOptions[i], centerX, 320 + i * 50);
         }
 
         // Instructions
