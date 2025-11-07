@@ -31,62 +31,74 @@ public class GameEngine extends Application {
     private SaveManager saveManager;
     private LevelSelectScene levelSelectScene;
 
-    public void switchToLevelSelectScene() {
-        if (levelSelectScene == null) {
-            levelSelectScene = new LevelSelectScene(ctx, this);
-        }
-        currentScene = levelSelectScene;
-        currentScene.start();
-        System.out.println("Switched to Level Select Scene");
-    }
-
-    public void startGameAtLevel(int levelIndex) {
-        switchToGameScene();
-        if (gameScene != null) {
-            gameScene.startGameAtLevel(levelIndex);
-        }
-    }
-
+    //================= START ====================
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.isRunning = true;
 
-        System.out.println("GameEngine Starting...");
+        System.out.println("GameEngine Starting");
 
-        setupWindow();
-        initializeManagers();
-        initializeScenes();
-        setupGameLoop();
+        setupWindow(); // tạo canvas, các scene, set stage
+        initializeManagers(); // tạo soundmanager, savemanager
+        initializeScenes(); // các scene
+        setupGameLoop(); // AnimationTimer chạy update + render liên tục
 
         System.out.println("GameEngine Started Successfully!");
     }
 
-    private void initializeManagers() {
-        System.out.println("🎵 Initializing SoundManager...");
-        soundManager = SoundManager.getInstance();
-        soundManager.initialize();
+    private void setupWindow() {
+        canvas = new Canvas(Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT); // bảng vẽ
+        ctx = canvas.getGraphicsContext2D(); // bút vẽ
 
-        System.out.println("💾 Initializing SaveManager...");
-        saveManager = SaveManager.getInstance();
-        // Test sound
-        soundManager.playSound("hit");
+        StackPane root = new StackPane(canvas); // để sau này xếp chồng hud,menu,... lên canvas
+        Scene scene = new Scene(root, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT); // tạo scene chứa root
+        // Stage (cửa sổ) → chứa Scene → chứa StackPane → chứa Canvas.
+
+        setupInputHandling(scene); // method riêng để xử lý điều khiển của người chơi
+        // JavaFx bắt events ở cấp scene nên cần truyền nó vào
+
+        primaryStage.setTitle("ARKANOID");
+        primaryStage.setScene(scene); // gắn scene vừa tạo vào stage
+        // Stage = cửa sổ, Scene = nội dung bên trong
+        // k gắn nội dung thì k có gì hiển thị
+
+        primaryStage.setResizable(false);
+        primaryStage.show(); // JavaFX runtime bắt đầu loop UI chính
+        // bỏ -> k show -> k thấy (ctrinh vẫn chạy)
     }
 
-    private void initializeScenes() {
-        System.out.println("🎮 Initializing Scenes...");
+    private void setupInputHandling(Scene scene) {
+        scene.setOnKeyPressed(e -> { // Gắn sự kiện khi người chơi nhấn phím
+            if (currentScene != null) {
+                currentScene.handleInput(e); // để scene hiện tại xử lý
+            }
+        });
 
-        // Truyền callback lambda
-//        menuScene = new MenuScene(ctx, () -> {
-//            soundManager.onGameStart();
-//            switchToGameScene();
-//        }, this::switchToHighscoreScene
-//        );
+        scene.setOnKeyReleased(e -> { // sự kiện nhả phím
+            if (currentScene != null) {
+                currentScene.handleInput(e);
+            }
+        });
+    }
 
+    private void initializeManagers() {
+        System.out.println("Initializing SoundManager");
+        soundManager = SoundManager.getInstance();
+        soundManager.initialize(); // initialize() phải được gọi trước khi phát sound (khởi tạo), k thì null
+
+        System.out.println("Initializing SaveManager");
+        saveManager = SaveManager.getInstance();
+    }
+
+    private void initializeScenes() { // khởi tạo all scenes
+        System.out.println("Initializing Scenes");
+
+        // MenuScene chỉ cần gọi callback, GameEngine sẽ chuyển sang GameScene
         menuScene = new MenuScene(ctx,
                 this::switchToGameScene,
                 this::switchToHighscoreScene,
-                this::switchToLevelSelectScene  // THÊM callback này
+                this::switchToLevelSelectScene
         );
 
         gameScene = new GameScene(ctx, this, () -> {
@@ -103,65 +115,33 @@ public class GameEngine extends Application {
         // Khởi tạo HighscoreScene
         highscoreScene = new HighscoreScene(ctx, this::switchToMenuScene);
 
-        // NameInputScene sẽ được tạo khi cần, khởi tạo là null
+        // level select scene
+        levelSelectScene = new LevelSelectScene(ctx, this);
+
+        // NameInputScene, gameOverScene sẽ được tạo khi cần
         nameInputScene = null;
         gameOverScene = null;
 
-        // Bắt đầu với Menu
-        currentScene = menuScene;
+        // Gán menu là scene đầu tiên
+        currentScene = menuScene; // scene hiện tại đang hiển thị và nhận input
         currentScene.start();
         soundManager.playMenuMusic();
     }
 
-    private void setupWindow() {
-        canvas = new Canvas(Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
-        ctx = canvas.getGraphicsContext2D();
-
-        StackPane root = new StackPane(canvas);
-        Scene scene = new Scene(root, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT);
-
-        setupInputHandling(scene);
-
-        primaryStage.setTitle("GAMEGr08 - Arkanoid Remake");
-        primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
-        primaryStage.show();
-    }
-
-    private void setupInputHandling(Scene scene) {
-        scene.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.S) {
-                soundManager.playSound("hit"); // Test sound
-            }
-            if (e.getCode() == KeyCode.B) {
-                soundManager.playBackgroundMusic(); // Test music
-            }
-
-            if (currentScene != null) {
-                currentScene.handleInput(e);
-            }
-        });
-
-        scene.setOnKeyReleased(e -> {
-            if (currentScene != null) {
-                currentScene.handleInput(e);
-            }
-        });
-    }
-
-    private void setupGameLoop() {
-        lastUpdateTime = System.nanoTime();
+    private void setupGameLoop() { // game bắt đầu chạy liên tục, sau khi window, scene, managers đã setup xong
+        lastUpdateTime = System.nanoTime(); // lưu thời điểm hiện tại để làm mốc tính
 
         AnimationTimer gameLoop = new AnimationTimer() {
             @Override
-            public void handle(long now) {
+            public void handle(long now) { // now: thời điểm hiện tại
                 double deltaTime = (now - lastUpdateTime) / 1_000_000_000.0;
                 lastUpdateTime = now;
 
-                update(deltaTime);
-                render();
+                update(deltaTime); // cập nhật logic game
+                render(); // vẽ lại
             }
         };
+
         gameLoop.start();
     }
 
@@ -177,13 +157,7 @@ public class GameEngine extends Application {
         }
     }
 
-    public void switchToGameScene() {
-        if (currentScene != null) currentScene.cleanup();
-        currentScene = gameScene;
-        currentScene.start();
-        System.out.println("🎮 Switched to Game Scene");
-    }
-
+    //============SCENE SWITCHING ===================
     public void switchToMenuScene() {
         if (currentScene != null) currentScene.cleanup();
         currentScene = menuScene;
@@ -192,35 +166,49 @@ public class GameEngine extends Application {
         System.out.println("Switched to Menu Scene");
     }
 
+    public void switchToGameScene() {
+        if (currentScene != null) currentScene.cleanup(); // dọn dẹp
+        currentScene = gameScene;
+        currentScene.start();
+        System.out.println("Switched to Game Scene");
+    }
+
     public void switchToHighscoreScene() {
         if (currentScene != null) currentScene.cleanup();
         currentScene = highscoreScene;
         currentScene.start();
-        System.out.println("🏆 Switched to Highscore Scene");
+        System.out.println("Switched to Highscore Scene");
+    }
+
+    public void switchToLevelSelectScene() {
+        if (currentScene != null) currentScene.cleanup();
+        currentScene = levelSelectScene;
+        currentScene.start();
+        System.out.println("Switched to Level Select Scene");
     }
 
     public void switchToNameInputScene(int score, int level) {
         if (currentScene != null) currentScene.cleanup();
+        // giờ mới tạo nameInputScene
         nameInputScene = new NameInputScene(ctx, score, level, this::switchToHighscoreScene);
         currentScene = nameInputScene;
         currentScene.start();
-        System.out.println("📝 Switched to Name Input Scene");
+        System.out.println("Switched to Name Input Scene");
     }
 
     public void switchToGameOverScene(int score, int level) {
         if (currentScene != null) currentScene.cleanup();
-
-        // Tạo GameOverScene mới
+        // giờ mới tạo GameOverScene
         gameOverScene = new GameOverScene(ctx, score, level,
                 this::restartGame,
                 this::switchToMenuScene
         );
-
         currentScene = gameOverScene;
         currentScene.start();
-        System.out.println("💀 Switched to Game Over Scene - Score: " + score + ", Level: " + level);
+        System.out.println("Switched to Game Over Scene - Score: " + score + ", Level: " + level);
     }
 
+    //================ GAME STATE METHODS ====================
     public void pauseGame() {
         if (currentScene == gameScene) {
             currentScene = pauseScene;
@@ -232,19 +220,20 @@ public class GameEngine extends Application {
     public void resumeGame() {
         if (currentScene == pauseScene) {
             currentScene = gameScene;
-            ((GameScene) gameScene).resumeFromPause(); // Thông báo resume
+            ((GameScene) gameScene).resumeFromPause();
             System.out.println("Game resumed");
         }
     }
 
     public void restartGame() {
-        System.out.println("Restarting game...");
+        System.out.println("Restarting game");
         if (currentScene != null) currentScene.cleanup();
 
         // Tạo game scene mới
         gameScene = new GameScene(ctx, this, () -> {
             gameOver(gameScene.getScore(), gameScene.getCurrentLevel());
         });
+
         currentScene = gameScene;
         currentScene.start();
 
@@ -252,22 +241,32 @@ public class GameEngine extends Application {
     }
 
     public void gameOver(int score, int level) {
-        System.out.println("💀 Game Over - Score: " + score + ", Level: " + level);
+        System.out.println("Game Over - Score: " + score + ", Level: " + level);
 
-        // Kiểm tra xem có phải highscore mới không
+        // có phải highscore mới không
         if (saveManager.isHighscore(score)) {
-            System.out.println("🎉 New Highscore Achieved!");
+            System.out.println("New Highscore Achieved!");
             switchToNameInputScene(score, level);
+        } else {
+            switchToGameOverScene(score, level);
         }
-//        } else {
-//            System.out.println("😊 No new highscore, returning to menu");
-//            switchToGameOverScene(score, level);
-//        }
-
-        // LUÔN HIỂN THỊ GAME OVER SCENE
-        switchToGameOverScene(score, level);
     }
 
+    //=================================
+    public void startGameAtLevel(int levelIndex) {
+        switchToGameScene();
+        if (gameScene != null) {
+            gameScene.startGameAtLevel(levelIndex);
+        }
+    }
+
+    // để game scene có thể gọi game over
+    // Scene chỉ báo “game over” → engine quyết định scene tiếp theo
+    public void notifyGameOver(int score, int level) {
+        gameOver(score, level);
+    }
+
+    //================ STOP ========================
     @Override
     public void stop() {
         isRunning = false;
@@ -276,9 +275,10 @@ public class GameEngine extends Application {
         if (saveManager != null) saveManager.cleanup();
         System.out.println("GameEngine Stopped");
     }
-
-    // Utility method để game scene có thể gọi game over
-    public void notifyGameOver(int score, int level) {
-        gameOver(score, level);
-    }
 }
+
+// GameEngine được khởi tạo (start) → window, managers, scenes.
+//Game loop chạy → update + render.
+//Người chơi điều khiển → scene chuyển → game state thay đổi (pause/restart/gameOver).
+//Khi cần API từ bên ngoài (chọn level, kết thúc game) → gọi startGameAtLevel, notifyGameOver.
+//Cuối cùng dừng game (stop).

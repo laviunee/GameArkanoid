@@ -3,6 +3,7 @@ package Entities.Power;
 import Entities.Ball;
 import Entities.Paddle;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 
 public class PowerUpPierceBall extends PowerUp {
 
@@ -15,10 +16,6 @@ public class PowerUpPierceBall extends PowerUp {
     public void applyEffect(Paddle paddle, Ball ball) {
         System.out.println("PowerUp: Pierce Ball Activated!");
         ball.setPierce(true);
-
-        // Optional: đổi màu bóng để dễ nhận biết
-        ball.setColor(javafx.scene.paint.Color.RED);
-
         collect();
     }
 }

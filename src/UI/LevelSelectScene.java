@@ -43,10 +43,10 @@ public class LevelSelectScene extends SceneManager {
         backgroundImage = spriteLoader.loadSprite(path, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT, true, false);
 
         if (backgroundImage == null || backgroundImage.isError()) {
-            System.err.println("⚠️ LevelSelectScene background not found: " + path + ". Using fallback.");
+            System.err.println("⚠LevelSelectScene background not found: " + path + ". Using fallback.");
             backgroundImage = null;
         } else {
-            System.out.println("✅ LevelSelectScene background loaded: " + path);
+            System.out.println("LevelSelectScene background loaded: " + path);
         }
     }
 

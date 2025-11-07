@@ -342,28 +342,4 @@ public class SoundManager {
         soundEffects.clear();
         System.out.println("SoundManager cleaned up");
     }
-
-    // ==================== DEBUG ====================
-
-    public void printStatus() {
-        System.out.println("=== SOUND MANAGER STATUS ===");
-        System.out.println("Initialized: " + initialized);
-        System.out.println("Sound Enabled: " + soundEnabled);
-        System.out.println("In Game: " + inGame);
-        System.out.println("Sounds Loaded: " + soundEffects.size());
-        System.out.println("Menu Music: " + (menuMusic != null ?
-                menuMusic.getStatus() + " (vol: " + menuMusic.getVolume() + ")" : "NULL"));
-        System.out.println("Background Music: " + (backgroundMusic != null ?
-                backgroundMusic.getStatus() + " (vol: " + backgroundMusic.getVolume() + ")" : "NULL"));
-        System.out.println("Available Sounds: " + soundEffects.keySet());
-        System.out.println("============================");
-
-    }
-
-    public void onLevelComplete() {
-        if (isSoundEnabled()) {
-            // Có thể thêm âm thanh level complete ở đây
-            System.out.println("🎵 Level complete sound");
-        }
-    }
 }

@@ -10,6 +10,7 @@ public class CollisionManager {
     public static boolean checkBallPaddleCollision(Ball ball, Paddle paddle) {
         if (!ball.isActive()) return false;
 
+        // lấy vị trí & kích thước
         double ballX = ball.getPosition().x;
         double ballY = ball.getPosition().y;
         double ballRadius = ball.getRadius();
@@ -25,11 +26,10 @@ public class CollisionManager {
                 ballX + ballRadius >= paddleX - paddleWidth / 2 &&
                 ballX - ballRadius <= paddleX + paddleWidth / 2;
 
-        if (isColliding && ball.getVelocity().y > 0) {
+        if (isColliding && ball.getVelocity().y > 0) { // va chạm + bóng đang đi xuống
             handlePaddleBounce(ball, paddle, ballX, ballY, paddleX, paddleY, paddleWidth, paddleHeight);
             return true;
         }
-
         return false;
     }
 
@@ -39,9 +39,9 @@ public class CollisionManager {
                                            double paddleWidth, double paddleHeight) {
         double ballRadius = ball.getRadius();
 
-        // Tính vị trí va chạm trên paddle (-1 đến 1)
+        // Tính vị trí va chạm trên paddle (-1 đến 1) trái - giữa - phải
         double hitPosition = (ballX - paddleX) / (paddleWidth / 2);
-        hitPosition = Math.max(-0.9, Math.min(0.9, hitPosition));
+        hitPosition = Math.max(-0.8, Math.min(0.8, hitPosition));
 
         // Góc nảy từ -60 đến 60 độ
         double bounceAngle = hitPosition * 60.0;
@@ -52,13 +52,14 @@ public class CollisionManager {
                 ball.getVelocity().y * ball.getVelocity().y);
         double speed = Math.max(currentSpeed, Config.BALL_SPEED * 0.8);
 
-        // Tính velocity mới
+        // velocity mới
         double newVX = speed * Math.sin(angleRad);
-        double newVY = -Math.abs(speed * Math.cos(angleRad));
+        double newVY = - Math.abs(speed * Math.cos(angleRad));
 
         // Đặt velocity và vị trí mới
         ball.setVelocity(newVX, newVY);
         ball.getPosition().y = paddleY - paddleHeight / 2 - ballRadius - 1;
+        // sau khi đổi hướng, đặt tọa độ y của bóng lên trên paddle một chút
 
         System.out.println("Paddle collision - HitPos: " + hitPosition +
                 ", Angle: " + bounceAngle + "°, Speed: " + speed);
@@ -73,10 +74,10 @@ public class CollisionManager {
 
         if (brick.collidesWith(ballX, ballY, ballRadius)) {
 
-            // ⚡ Nếu bóng xuyên phá, không đảo hướng
+            // Nếu bóng xuyên phá, không đảo hướng
             if (ball.isPierce()) {
                 System.out.println("PierceBall xuyên qua gạch!");
-                return true; // chỉ báo có va chạm
+                return true; // chỉ báo gamescene có va chạm để phá gạch, k đổi hướng
             }
             // Xác định hướng va chạm để nảy đúng hướng
             double brickLeft = brick.getPosition().x;
@@ -103,7 +104,6 @@ public class CollisionManager {
                 ball.getVelocity().y = -ball.getVelocity().y;
                 System.out.println("Brick top/bottom collision - Y reversed");
             }
-
             return true;
         }
         return false;

@@ -53,12 +53,12 @@ public class PauseScene extends SceneManager {
         for (String path : paths) {
             pauseBackground = spriteLoader.loadSprite(path, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT, true, false);
             if (pauseBackground != null && !pauseBackground.isError()) {
-                System.out.println("✅ Pause background loaded: " + path);
+                System.out.println("Pause background loaded: " + path);
                 return;
             }
         }
 
-        System.err.println("⚠️ Pause background not found. Using fallback color.");
+        System.err.println("Pause background not found. Using fallback color.");
         pauseBackground = null;
     }
 

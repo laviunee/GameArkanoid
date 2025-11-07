@@ -39,10 +39,10 @@ public class HighscoreScene extends SceneManager {
         String path = "/images/backgrounds/highscore_bg.png";
         backgroundImage = spriteLoader.loadSprite(path, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT, true, false);
         if (backgroundImage == null || backgroundImage.isError()) {
-            System.err.println("⚠️ HighscoreScene background not found: " + path + ". Using gradient fallback.");
+            System.err.println("⚠HighscoreScene background not found: " + path + ". Using gradient fallback.");
             backgroundImage = null;
         } else {
-            System.out.println("✅ HighscoreScene background loaded: " + path);
+            System.out.println("HighscoreScene background loaded: " + path);
         }
     }
 

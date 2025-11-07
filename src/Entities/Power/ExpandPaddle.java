@@ -17,7 +17,7 @@ public class ExpandPaddle extends PowerUp {
 
     @Override
     public void applyEffect(Paddle paddle, Ball ball) {
-        System.out.println("🔵 Expand Paddle activated!");
+        System.out.println("Expand Paddle activated!");
         paddle.expand(EXPAND_FACTOR);
 
         new java.util.Timer().schedule(
@@ -25,7 +25,7 @@ public class ExpandPaddle extends PowerUp {
                     @Override
                     public void run() {
                         paddle.resetSize();
-                        System.out.println("🔵 Expand Paddle deactivated");
+                        System.out.println("Expand Paddle deactivated");
                     }
                 },
                 10000

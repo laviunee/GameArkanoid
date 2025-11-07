@@ -18,6 +18,5 @@ public class NormalBrick extends Brick {
     @Override
     public void onHit() {
         super.onHit();
-        // Có thể thêm hiệu ứng đặc biệt ở đây
     }
 }

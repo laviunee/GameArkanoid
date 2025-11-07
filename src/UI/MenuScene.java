@@ -80,34 +80,34 @@ public class MenuScene extends SceneManager {
 
     private void loadFontsFromResources() {
         try {
-            // 🎯 CHỈ LOAD TITLE FONT TỪ FILE
+            // CHỈ LOAD TITLE FONT TỪ FILE
             InputStream titleFontStream = getClass().getResourceAsStream("/fonts/MomoTrustDisplay-Regular.ttf");
             if (titleFontStream != null) {
                 titleFont = Font.loadFont(titleFontStream, 80);
                 titleFontStream.close();
-                System.out.println("✅ Menu title font loaded successfully");
+                System.out.println("Menu title font loaded successfully");
             } else {
-                System.err.println("❌ Title font not found, using fallback");
+                System.err.println("Title font not found, using fallback");
                 titleFont = Font.font("Impact", FontWeight.BOLD, 80);
             }
 
         } catch (Exception e) {
-            System.err.println("❌ Error loading menu fonts: " + e.getMessage());
+            System.err.println("Error loading menu fonts: " + e.getMessage());
             setFallbackFonts();
         }
 
-        // 🎯 CÁC FONT KHÁC DÙNG HỆ THỐNG
+        // CÁC FONT KHÁC DÙNG HỆ THỐNG
         setSystemFonts();
     }
 
     private void setSystemFonts() {
-        // 🎯 OPTION FONT - DÙNG FONT HỆ THỐNG
+        // OPTION
         optionFont = Font.font("Arial", FontWeight.BOLD, 32); // Giảm size để fit thêm option
 
-        // 🎯 INFO FONT - DÙNG FONT HỆ THỐNG
+        // INFO
         infoFont = Font.font("Courier New", FontWeight.BOLD, 15);
 
-        // 🎯 CREDITS FONT - DÙNG FONT HỆ THỐNG
+        // CREDITS
         creditsFont = Font.font("Courier New", FontWeight.BOLD, 20);
     }
 
@@ -225,7 +225,7 @@ public class MenuScene extends SceneManager {
 
 
     private void drawMainMenuOptions() {
-        // 🎯 OPTIONS DÙNG FONT HỆ THỐNG
+        // OPTIONS
         ctx.setFont(optionFont);
         String[] options = getCurrentOptions();
 
@@ -307,7 +307,7 @@ public class MenuScene extends SceneManager {
     }
 
     private void drawInstructions() {
-        // 🎯 MAIN MENU INSTRUCTIONS DÙNG FONT HỆ THỐNG
+        // MAIN MENU INSTRUCTIONS
         ctx.setFont(infoFont);
         ctx.setFill(Color.LIGHTGRAY);
         ctx.fillText("USE ↑↓ OR W/S TO NAVIGATE", Config.SCREEN_WIDTH / 2 - 120, 660);
@@ -316,7 +316,7 @@ public class MenuScene extends SceneManager {
     }
 
     private void drawCreditsInstructions() {
-        // 🎯 CREDITS INSTRUCTIONS DÙNG FONT HỆ THỐNG
+        // CREDITS INSTRUCTIONS
         ctx.setFont(infoFont);
         ctx.setFill(Color.LIGHTGRAY);
         ctx.fillText("PRESS ENTER TO RETURN", Config.SCREEN_WIDTH / 2 - 120, 700);
@@ -415,7 +415,7 @@ public class MenuScene extends SceneManager {
         if (onLevelSelectSelected != null) {
             onLevelSelectSelected.run();
         } else {
-            System.err.println("❌ Level select callback is null!");
+            System.err.println("Level select callback is null!");
             soundManager.playSound("menu_select");
             startGame();
         }

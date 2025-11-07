@@ -208,7 +208,7 @@ public class SaveManager {
         unlockLevel(level + 1);
 
         saveGameProgress();
-        System.out.println("✅ Level " + level + " completed! Score: " + score);
+        System.out.println("Level " + level + " completed! Score: " + score);
     }
 
     public boolean isLevelCompleted(int level) {
@@ -226,7 +226,7 @@ public class SaveManager {
     public void resetProgress() {
         gameProgress = new GameProgress();
         saveGameProgress();
-        System.out.println("🔄 Game progress reset");
+        System.out.println("Game progress reset");
     }
 
     @SuppressWarnings("unchecked")

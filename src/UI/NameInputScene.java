@@ -48,13 +48,13 @@ public class NameInputScene extends SceneManager {
                 return;
             }
         }
-        System.err.println("⚠️ NameInputScene background not found. Using fallback color.");
+        System.err.println("NameInputScene background not found. Using fallback color.");
         backgroundImage = null;
     }
 
     @Override
     public void start() {
-        System.out.println("📝 Name Input Scene started");
+        System.out.println("Name Input Scene started");
         playerName.setLength(0);
 
         // Dừng nhạc đang phát
@@ -131,7 +131,7 @@ public class NameInputScene extends SceneManager {
 
     @Override
     public void cleanup() {
-        System.out.println("📝 Name Input Scene cleaned up");
+        System.out.println("Name Input Scene cleaned up");
         soundManager.stopAllSounds();
     }
 }

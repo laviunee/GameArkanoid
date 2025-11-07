@@ -78,6 +78,13 @@ public class GameScene extends SceneManager {
     private Image mouseOnIcon;
     private Image mouseOffIcon;
 
+    //================ CONSTRUCTOR & SETUP ========================
+
+    // GameEngine gameEngine: tham chiếu đến “máy chủ” điều khiển game,
+    // giúp GameScene gọi các phương thức như pauseGame(), switchToGameOverScene().
+    //
+    // runable: interface chứa run()
+    // Runnable onGameOver: hàm call back có thể chạy sau này để xử lý khi game kết thúc
     public GameScene(GraphicsContext ctx, GameEngine gameEngine, Runnable onGameOver) {
         this.ctx = ctx;
         this.canvas = ctx.getCanvas();
@@ -88,47 +95,53 @@ public class GameScene extends SceneManager {
         this.isRunning = true;
         this.levelManager = new LevelManager();
 
-        loadGameSprites();
+        loadGameSprites(); // load chuẩn bị cho render
         setupMouseControls();
     }
 
-    // === PUBLIC METHODS ===
+    private void loadGameSprites() {
+        paddleImage = spriteLoader.loadSprite("/images/paddle.png");
+        ballImage = spriteLoader.loadSprite("/images/ball.png");
+        brickNormalImage = spriteLoader.loadSprite("/images/bricks/normal.png");
+        brickStrongImage = spriteLoader.loadSprite("/images/bricks/strong.png");
+        brickStrongCrackedImage = spriteLoader.loadSprite("/images/bricks/strong_cracked.png");
+
+        powerupExpandImage = spriteLoader.loadSprite("/images/powerup/expand.png");
+        powerupFastballImage = spriteLoader.loadSprite("/images/powerup/fastball.png");
+        powerupMultiballImage = spriteLoader.loadSprite("/images/powerup/multiball.png");
+        powerupExtraliveImage = spriteLoader.loadSprite("/images/powerup/extralive.png");
+        powerupPierceballImage = spriteLoader.loadSprite("/images/powerup/pierceball.png");
+
+        heartIcon = spriteLoader.loadSprite("/images/icons/heart.png", 20, 20, true, true);
+        soundOnIcon = spriteLoader.loadSprite("/images/icons/sound_on.png", 20, 20, true, true);
+        soundOffIcon = spriteLoader.loadSprite("/images/icons/sound_off.png", 20, 20, true, true);
+        mouseOnIcon = spriteLoader.loadSprite("/images/icons/mouse_on.png", 20, 20, true, true);
+        mouseOffIcon = spriteLoader.loadSprite("/images/icons/mouse_off.png", 20, 20, true, true);
+
+        System.out.println("Game sprites loaded successfully");
+    }
+
+    private void setupMouseControls() {
+        canvas.setOnMouseMoved(this::handleMouseMoved);
+        canvas.setOnMouseDragged(this::handleMouseDragged);
+        canvas.setOnMouseExited(this::handleMouseExited);
+    }
+
+    //===================== Public API cho game từ bên ngoài ==============
     public void startGameAtLevel(int levelIndex) {
-        System.out.println("🎮 Starting game at level: " + (levelIndex + 1));
-
-        // Reset game state
-        score = 0;
-        lives = 3;
-        isRunning = true;
-        isPaused = false;
-
-        // Load level cụ thể
+        // System.out.println("Starting game at level: " + (levelIndex + 1));
         levelManager.loadLevel(levelIndex);
-
-        // Reset paddle và ball
-        double paddleX = Config.SCREEN_WIDTH / 2;
-        double paddleY = Config.SCREEN_HEIGHT - Config.PADDLE_OFFSET_Y;
-        paddle = new Paddle(paddleX, paddleY); // TẠO PADDLE MỚI
-
-        balls = new ArrayList<>();
-        spawnBall();
-        PowerFactory.setBalls(balls);
-        PowerFactory.setGameScene(this);
-
-        powerUps = new ArrayList<>();
-
-        soundManager.onGameStart();
     }
 
     public void resumeFromPause() {
         isPaused = false;
-        System.out.println("GameScene resumed from pause");
+        // System.out.println("GameScene resumed from pause");
     }
 
-    // === SCENE MANAGER METHODS ===
+    // ================ SCENE MANAGER METHODS ====================
     @Override
     public void start() {
-        System.out.println("🎮 GameScene: Starting game...");
+        //System.out.println("GameScene: Starting game...");
 
         soundManager.stopAllSounds();
 
@@ -137,8 +150,8 @@ public class GameScene extends SceneManager {
         double paddleY = Config.SCREEN_HEIGHT - Config.PADDLE_OFFSET_Y;
         paddle = new Paddle(paddleX, paddleY);
 
-        balls = new ArrayList<>();
-        spawnBall();
+        balls = new ArrayList<>(); // vì sau này có thể có > 1 ball
+        spawnBall(); // bóng đầu tiên bay ra trong game
         PowerFactory.setBalls(balls);
         PowerFactory.setGameScene(this);
 
@@ -151,10 +164,10 @@ public class GameScene extends SceneManager {
 
         isRunning = true;
         isPaused = false;
-        mouseControlEnabled = false;
+        mouseControlEnabled = true;
 
-        soundManager.onGameStart();
-        System.out.println("🎵 GameScene: Game start signal sent to SoundManager");
+        soundManager.onGameStart(); // Báo cho SoundManager biết rằng gameplay bắt đầu
+        // System.out.println("GameScene: Game start signal sent to SoundManager");
     }
 
     @Override
@@ -195,7 +208,7 @@ public class GameScene extends SceneManager {
 
         // Kiểm tra game over
         if (lives <= 0) {
-            System.out.println("GAME OVER!");
+            // System.out.println("GAME OVER!");
             isRunning = false;
             handleGameOver();
         }
@@ -215,8 +228,8 @@ public class GameScene extends SceneManager {
 
     @Override
     public void handleInput(KeyEvent event) {
-        if (event.getEventType() == KeyEvent.KEY_PRESSED) {
-            switch (event.getCode()) {
+        if (event.getEventType() == KeyEvent.KEY_PRESSED) { // kiểm tra player vừa nhấn phím
+            switch (event.getCode()) { // lấy mã phím vừa nhấn
                 case LEFT, A -> {
                     if (!mouseControlEnabled) movePaddleLeft();
                 }
@@ -235,7 +248,7 @@ public class GameScene extends SceneManager {
             }
         }
 
-        if (event.getEventType() == KeyEvent.KEY_RELEASED) {
+        if (event.getEventType() == KeyEvent.KEY_RELEASED) { // nhả phím
             switch (event.getCode()) {
                 case LEFT, RIGHT, A, D -> {
                     if (!mouseControlEnabled) stopPaddle();
@@ -246,7 +259,7 @@ public class GameScene extends SceneManager {
 
     @Override
     public void cleanup() {
-        System.out.println("Cleaning up Game Scene...");
+        // System.out.println("Cleaning up Game Scene...");
         if (balls != null) balls.clear();
         if (powerUps != null) powerUps.clear();
         isPaused = false;
@@ -254,7 +267,6 @@ public class GameScene extends SceneManager {
         // Remove mouse event handlers
         canvas.setOnMouseMoved(null);
         canvas.setOnMouseDragged(null);
-        canvas.setOnMouseClicked(null);
         canvas.setOnMouseExited(null);
     }
 
@@ -294,8 +306,11 @@ public class GameScene extends SceneManager {
             for (Brick brick : levelManager.getBricks()) {
                 if (CollisionManager.checkBallBrickCollision(ball, brick)) {
                     brick.onHit();
-                    score += brick.getScoreValue();
-
+                    // Chỉ cộng điểm khi gạch bị phá hủy
+                    if (brick.isToBeRemoved()) {
+                        score += brick.getScoreValue();
+                        System.out.println("+" + brick.getScoreValue() + " points!");
+                    }
                     // Play sound
                     if (!ball.isPierce()) {
                         soundManager.playSound("hit");
@@ -411,11 +426,9 @@ public class GameScene extends SceneManager {
             // Chuyển level tiếp theo
             levelManager.nextLevel();
             resetBallAndPaddle();
-            showLevelCompleteMessage();
-            soundManager.onLevelComplete();
         } else {
             // Hoàn thành tất cả level
-            System.out.println("🎉 ALL LEVELS COMPLETED! YOU WIN!");
+            System.out.println("ALL LEVELS COMPLETED! YOU WIN!");
             soundManager.onGameWin();
             checkHighscore();
         }
@@ -435,11 +448,6 @@ public class GameScene extends SceneManager {
         System.out.println("Ball and paddle reset for new level");
     }
 
-    private void showLevelCompleteMessage() {
-        System.out.println("LEVEL " + levelManager.getCurrentLevel() + " START!");
-        // Có thể thêm hiệu ứng visual ở đây
-    }
-
     private void checkHighscore() {
         SaveManager saveManager = SaveManager.getInstance();
         if (saveManager.isHighscore(score)) {
@@ -447,14 +455,6 @@ public class GameScene extends SceneManager {
         } else {
             handleGameOver();
         }
-    }
-
-    // === INPUT HANDLERS ===
-    private void setupMouseControls() {
-        canvas.setOnMouseMoved(this::handleMouseMoved);
-        canvas.setOnMouseDragged(this::handleMouseDragged);
-        canvas.setOnMouseClicked(this::handleMouseClicked);
-        canvas.setOnMouseExited(this::handleMouseExited);
     }
 
     private void handleMouseMoved(MouseEvent event) {
@@ -469,18 +469,6 @@ public class GameScene extends SceneManager {
         if (!isRunning || isPaused) return;
         mouseX = event.getX();
         paddle.moveToMouse(mouseX);
-    }
-
-    private void handleMouseClicked(MouseEvent event) {
-        if (!isRunning || isPaused) return;
-
-        if (event.isPrimaryButtonDown()) {
-            launchBall();
-        }
-
-        if (event.isSecondaryButtonDown()) {
-            toggleMouseControl();
-        }
     }
 
     private void handleMouseExited(MouseEvent event) {
@@ -729,7 +717,7 @@ public class GameScene extends SceneManager {
 
     private void drawUI() {
         double hudHeight = 80;
-        ctx.setFont(Font.font("Arial", 20)); // chữ to hơn
+        ctx.setFont(Font.font("Arial", 20));
         ctx.setFill(Color.WHITE);
         ctx.setStroke(Color.BLACK);
         ctx.setLineWidth(1.5);
@@ -745,7 +733,7 @@ public class GameScene extends SceneManager {
         // === LEVEL text (bigger + simple gradient) ===
         String levelText = "LEVEL " + levelManager.getCurrentLevel();
 
-// Font to hơn, đậm rõ
+        // Font to hơn, đậm rõ
         ctx.setFont(Font.font("Impact", FontWeight.BOLD, 40));
 
         LinearGradient gradient = new LinearGradient(
@@ -758,11 +746,11 @@ public class GameScene extends SceneManager {
         ctx.setLineWidth(2);
 
 
-// Căn giữa như cũ
+        // Căn giữa
         double levelTextWidth = ctx.getFont().getSize() * levelText.length() * 0.35;
         double levelX = Config.SCREEN_WIDTH / 2 - levelTextWidth / 2;
 
-// Vẽ
+        // Vẽ
         ctx.strokeText(levelText, levelX, 53);
         ctx.fillText(levelText, levelX, 53);
 
@@ -802,65 +790,9 @@ public class GameScene extends SceneManager {
         if (onGameOver != null) {
             onGameOver.run();
         } else {
-            System.err.println("❌ GameScene: onGameOver callback is null!");
+            System.err.println("GameScene: onGameOver callback is null!");
             gameEngine.switchToMenuScene();
         }
-    }
-
-    private void loadGameSprites() {
-        try {
-            gameBackground = spriteLoader.loadSprite("/images/backgrounds/game_bg.png",
-                    Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT, true, false);
-            paddleImage = spriteLoader.loadSprite("/images/paddle.png");
-            ballImage = spriteLoader.loadSprite("/images/ball.png");
-            brickNormalImage = spriteLoader.loadSprite("/images/bricks/normal.png");
-            brickStrongImage = spriteLoader.loadSprite("/images/bricks/strong.png");
-            brickStrongCrackedImage = spriteLoader.loadSprite("/images/bricks/strong_cracked.png");
-
-            powerupExpandImage = spriteLoader.loadSprite("/images/powerup/expand.png");
-            powerupFastballImage = spriteLoader.loadSprite("/images/powerup/fastball.png");
-            powerupMultiballImage = spriteLoader.loadSprite("/images/powerup/multiball.png");
-            powerupExtraliveImage = spriteLoader.loadSprite("/images/powerup/extralive.png");
-            powerupPierceballImage = spriteLoader.loadSprite("/images/powerup/pierceball.png");
-
-            heartIcon = spriteLoader.loadSprite("/images/icons/heart.png", 20, 20, true, true);
-            soundOnIcon = spriteLoader.loadSprite("/images/icons/sound_on.png", 20, 20, true, true);
-            soundOffIcon = spriteLoader.loadSprite("/images/icons/sound_off.png", 20, 20, true, true);
-            mouseOnIcon = spriteLoader.loadSprite("/images/icons/mouse_on.png", 20, 20, true, true);
-            mouseOffIcon = spriteLoader.loadSprite("/images/icons/mouse_off.png", 20, 20, true, true);
-
-            System.out.println("Game sprites loaded successfully");
-
-        } catch (Exception e) {
-            System.err.println("Error loading game sprites: " + e.getMessage());
-
-            // Tạo fallback icons nếu không load được ảnh
-            createFallbackIcons();
-        }
-    }
-
-    // Phương thức tạo icons thay thế nếu không load được ảnh
-    private void createFallbackIcons() {
-        // Tạo icon trái tim đơn giản
-        heartIcon = createColoredIcon(20, 20, Color.RED);
-        soundOnIcon = createColoredIcon(20, 20, Color.GREEN);
-        soundOffIcon = createColoredIcon(20, 20, Color.RED);
-
-        // THÊM ICON MOUSE CONTROL FALLBACK
-        mouseOnIcon = createColoredIcon(20, 20, Color.GREEN);
-        mouseOffIcon = createColoredIcon(20, 20, Color.YELLOW);
-    }
-
-    private Image createColoredIcon(int width, int height, Color color) {
-        WritableImage image = new WritableImage(width, height);
-        PixelWriter pixelWriter = image.getPixelWriter();
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                pixelWriter.setColor(x, y, color);
-            }
-        }
-        return image;
     }
 
     // === GETTERS ===

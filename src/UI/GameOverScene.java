@@ -64,12 +64,12 @@ public class GameOverScene extends SceneManager {
         for (String path : paths) {
             backgroundImage = spriteLoader.loadSprite(path, Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT, true, false);
             if (backgroundImage != null && !backgroundImage.isError()) {
-                System.out.println("✅ GameOverScene background loaded: " + path);
+                System.out.println("GameOverScene background loaded: " + path);
                 return;
             }
         }
 
-        System.err.println("⚠️ GameOverScene background not found. Using gradient overlay.");
+        System.err.println("GameOverScene background not found. Using gradient overlay.");
         backgroundImage = null;
     }
 

@@ -1,18 +1,22 @@
 package Utils;
 
 import javafx.scene.image.Image;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class SpriteLoader {
     private static SpriteLoader instance;
-    private Map<String, Image> spriteCache;
+    private final Map<String, Image> spriteCache;
 
     private SpriteLoader() {
         spriteCache = new HashMap<>();
     }
 
+    // Singleton
     public static SpriteLoader getInstance() {
         if (instance == null) {
             instance = new SpriteLoader();
@@ -20,10 +24,12 @@ public class SpriteLoader {
         return instance;
     }
 
+    // Load sprite nhanh (không scale, không smooth)
     public Image loadSprite(String path) {
         return loadSprite(path, 0, 0, false, false);
     }
 
+    // Load sprite với tùy chọn width/height và smooth
     public Image loadSprite(String path, double width, double height, boolean preserveRatio, boolean smooth) {
         String cacheKey = path + "_" + width + "x" + height + "_smooth:" + smooth;
         if (spriteCache.containsKey(cacheKey)) {
@@ -31,49 +37,37 @@ public class SpriteLoader {
         }
 
         try {
-            System.out.println("Loading: " + path + " [smooth: " + smooth + "]");
-
             java.io.InputStream is = getClass().getResourceAsStream(path);
             if (is == null) {
-                System.err.println("InputStream is NULL for: " + path);
                 return createPlaceholder((int) width, (int) height);
             }
 
             Image image;
             if (width > 0 && height > 0) {
-                image = new Image(is, width, height, preserveRatio, smooth); // smooth parameter here
+                image = new Image(is, width, height, preserveRatio, smooth);
             } else {
-                image = new Image(is); // Không scale - giữ nguyên chất lượng
+                image = new Image(is);
             }
 
-            System.out.println("Loaded: " + path + " [" + image.getWidth() + "x" + image.getHeight() + "]");
             spriteCache.put(cacheKey, image);
             return image;
 
         } catch (Exception e) {
-            System.err.println("Exception loading: " + path);
             return createPlaceholder((int) width, (int) height);
         }
     }
 
+    // Placeholder màu hồng khi sprite mất
     private Image createPlaceholder(int width, int height) {
         int w = Math.max(width, 50);
         int h = Math.max(height, 50);
 
-        javafx.scene.canvas.Canvas canvas = new javafx.scene.canvas.Canvas(w, h);
-        javafx.scene.canvas.GraphicsContext gc = canvas.getGraphicsContext2D();
+        Canvas canvas = new Canvas(w, h);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        gc.setFill(javafx.scene.paint.Color.MAGENTA);
+        gc.setFill(Color.MAGENTA);
         gc.fillRect(0, 0, w, h);
-        gc.setStroke(javafx.scene.paint.Color.BLACK);
-        gc.strokeRect(0, 0, w, h);
-        gc.setFill(javafx.scene.paint.Color.WHITE);
-        gc.fillText("IMG", w / 2 - 10, h / 2 + 5);
 
         return canvas.snapshot(null, null);
-    }
-
-    public void clearCache() {
-        spriteCache.clear();
     }
 }

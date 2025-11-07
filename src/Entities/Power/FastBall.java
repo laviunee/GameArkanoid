@@ -17,7 +17,7 @@ public class FastBall extends PowerUp {
 
     @Override
     public void applyEffect(Paddle paddle, Ball ball) {
-        System.out.println("⚡ Fast Ball activated!");
+        System.out.println("Fast Ball activated!");
 
         ball.getVelocity().x *= SPEED_BOOST;
         ball.getVelocity().y *= SPEED_BOOST;

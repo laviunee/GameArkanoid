@@ -32,7 +32,6 @@ public abstract class Brick extends GameObject {
         // Brick thường không cần update
     }
 
-
     // Khi bóng chạm vào gạch
     public void onHit() {
         hitPoints--;

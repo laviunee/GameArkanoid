@@ -59,20 +59,20 @@ public class LevelManager {
 
     // === BACKGROUND PATHS FOR EACH LEVEL ===
     private static final String[] LEVEL_BACKGROUNDS = {
-            "/images/backgrounds/level1_bg.png",  // Level 1 - Classic
-            "/images/backgrounds/level2_bg.png",  // Level 2 - Ocean
-            "/images/backgrounds/level3_bg.png",  // Level 3 - Space
-            "/images/backgrounds/level4_bg.png",  // Level 4 - Lava
-            "/images/backgrounds/level5_bg.png"   // Level 5 - Final
+            "/images/backgrounds/level1_bg.png",
+            "/images/backgrounds/level2_bg.png",
+            "/images/backgrounds/level3_bg.png",
+            "/images/backgrounds/level4_bg.png",
+            "/images/backgrounds/level5_bg.png"
     };
 
     // === FALLBACK COLORS FOR EACH LEVEL ===
     private static final Color[] LEVEL_BACKGROUND_COLORS = {
-            Color.DARKBLUE,     // Level 1
-            Color.DARKCYAN,     // Level 2
-            Color.DARKSLATEBLUE, // Level 3
-            Color.DARKRED,      // Level 4
-            Color.DARKMAGENTA   // Level 5
+            Color.DARKBLUE,
+            Color.DARKCYAN,
+            Color.DARKSLATEBLUE,
+            Color.DARKRED,
+            Color.DARKMAGENTA
     };
 
     private int currentLevel = 0;
@@ -80,17 +80,17 @@ public class LevelManager {
     private int totalBricks;
 
     // Khoảng cách giữa các brick
-    private static final double HORIZONTAL_GAP = 6;
-    private static final double VERTICAL_GAP = 6;
+    private static final double HORIZONTAL_GAP = 12;
+    private static final double VERTICAL_GAP = 12;
 
     // Background management
     private javafx.scene.image.Image currentBackground;
     private Color currentBackgroundColor;
 
+    // constructor
     public LevelManager() {
         this.bricks = new ArrayList<>();
     }
-
 
     public void loadLevel(int levelNumber) {
         if (levelNumber < 0 || levelNumber >= LEVELS.size()) {
@@ -100,12 +100,10 @@ public class LevelManager {
         this.currentLevel = levelNumber;
         this.bricks.clear();
 
-
         // Load background for this level
         loadLevelBackground(levelNumber);
         createBricks(LEVELS.get(levelNumber));
     }
-
 
     private void loadLevelBackground(int levelNumber) {
         try {
@@ -119,11 +117,11 @@ public class LevelManager {
                 throw new Exception("Background image failed to load");
             }
 
-            System.out.println("✅ Loaded background for Level " + (levelNumber + 1) + ": " + backgroundPath);
+            System.out.println("Loaded background for Level " + (levelNumber + 1) + ": " + backgroundPath);
 
         } catch (Exception e) {
-            System.err.println("❌ Failed to load background for Level " + (levelNumber + 1) + ": " + e.getMessage());
-            System.out.println("🔄 Using fallback color background");
+            System.err.println("Failed to load background for Level " + (levelNumber + 1) + ": " + e.getMessage());
+            System.out.println("Using fallback color background");
             currentBackground = null;
             currentBackgroundColor = LEVEL_BACKGROUND_COLORS[levelNumber];
         }
