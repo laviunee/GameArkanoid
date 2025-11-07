@@ -1,8 +1,7 @@
 package Entities.Power;
 
-import Entities.Paddle;
 import Entities.Ball;
-import Utils.Config;
+import Entities.Paddle;
 
 public class FastBall extends PowerUp {
     private static final double SPEED_BOOST = 1.5;

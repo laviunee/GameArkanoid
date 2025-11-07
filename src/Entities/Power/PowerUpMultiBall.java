@@ -1,10 +1,11 @@
 package Entities.Power;
 
-import Entities.Paddle;
 import Entities.Ball;
+import Entities.Paddle;
 import javafx.scene.image.Image;
-import java.util.List;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class PowerUpMultiBall extends PowerUp {
     private List<Ball> balls;

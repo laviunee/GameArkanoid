@@ -5,12 +5,12 @@ import Engine.GameEngine;
 import Engine.LevelManager;
 import Engine.SceneManager;
 import Entities.Ball;
-import Entities.Bricks.StrongBrick;
-import Entities.Bricks.NormalBrick;
-import Entities.Paddle;
 import Entities.Bricks.Brick;
-import Entities.Power.PowerUp;
+import Entities.Bricks.NormalBrick;
+import Entities.Bricks.StrongBrick;
+import Entities.Paddle;
 import Entities.Power.PowerFactory;
+import Entities.Power.PowerUp;
 import Utils.Config;
 import Utils.SaveManager;
 import Utils.SoundManager;
@@ -18,8 +18,8 @@ import Utils.SpriteLoader;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -27,7 +27,6 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
-import javafx.scene.image.PixelWriter;
 import javafx.scene.text.FontWeight;
 
 import java.util.ArrayList;
@@ -370,10 +369,10 @@ public class GameScene extends SceneManager {
             double paddleHeight = paddle.getHeight();
 
             // Simple rectangle collision check
-            if (powerUpX >= paddleX - paddleWidth/2 &&
-                    powerUpX <= paddleX + paddleWidth/2 &&
-                    powerUpY >= paddleY - paddleHeight/2 &&
-                    powerUpY <= paddleY + paddleHeight/2) {
+            if (powerUpX >= paddleX - paddleWidth / 2 &&
+                    powerUpX <= paddleX + paddleWidth / 2 &&
+                    powerUpY >= paddleY - paddleHeight / 2 &&
+                    powerUpY <= paddleY + paddleHeight / 2) {
 
                 powerUp.collect();
                 collectedPowerUps.add(powerUp);
@@ -617,9 +616,6 @@ public class GameScene extends SceneManager {
         ctx.strokeLine(0, hudHeight - 1, Config.SCREEN_WIDTH, hudHeight - 1);
     }
 
-
-
-
     private void drawBricks() {
         for (Brick brick : levelManager.getBricks()) {
             double x = brick.getPosition().x;
@@ -699,8 +695,8 @@ public class GameScene extends SceneManager {
     }
 
     private void drawPaddle() {
-        double x = paddle.getPosition().x - paddle.getWidth()/2;
-        double y = paddle.getPosition().y - paddle.getHeight()/2;
+        double x = paddle.getPosition().x - paddle.getWidth() / 2;
+        double y = paddle.getPosition().y - paddle.getHeight() / 2;
 
         if (paddleImage != null) {
             ctx.drawImage(paddleImage, x, y, paddle.getWidth(), paddle.getHeight());
@@ -873,10 +869,27 @@ public class GameScene extends SceneManager {
         System.out.println("Live added! Lives = " + lives);
     }
 
-    public boolean isRunning() { return isRunning; }
-    public int getScore() { return score; }
-    public int getLives() { return lives; }
-    public boolean isPaused() { return isPaused; }
-    public boolean isMouseControlEnabled() { return mouseControlEnabled; }
-    public int getCurrentLevel() { return levelManager.getCurrentLevel(); }
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public boolean isPaused() {
+        return isPaused;
+    }
+
+    public boolean isMouseControlEnabled() {
+        return mouseControlEnabled;
+    }
+
+    public int getCurrentLevel() {
+        return levelManager.getCurrentLevel();
+    }
 }

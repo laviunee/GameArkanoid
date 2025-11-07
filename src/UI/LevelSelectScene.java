@@ -82,7 +82,8 @@ public class LevelSelectScene extends SceneManager {
     }
 
     @Override
-    public void update(double deltaTime) { }
+    public void update(double deltaTime) {
+    }
 
     @Override
     public void render() {
@@ -114,8 +115,7 @@ public class LevelSelectScene extends SceneManager {
 
         ctx.setFill(Color.WHITE);
         ctx.setFont(Font.font("Arial", 16));
-        ctx.fillText("Unlocked: " + unlockedLevels + "/" + totalLevels,
-                Config.SCREEN_WIDTH / 2 - 50, 110);
+        ctx.fillText("Unlocked: " + unlockedLevels + "/" + totalLevels, Config.SCREEN_WIDTH / 2 - 50, 110);
     }
 
     private void drawLevelButtons() {
@@ -138,9 +138,7 @@ public class LevelSelectScene extends SceneManager {
 
         ctx.setFill(isUnlocked ? Color.WHITE : Color.GRAY);
         ctx.setFont(Font.font("Arial", 24));
-        ctx.fillText(String.valueOf(button.level),
-                button.x + button.width / 2 - 8,
-                button.y + button.height / 2 + 8);
+        ctx.fillText(String.valueOf(button.level), button.x + button.width / 2 - 8, button.y + button.height / 2 + 8);
 
         if (!isUnlocked) {
             ctx.setFill(Color.GOLD);
@@ -230,10 +228,15 @@ public class LevelSelectScene extends SceneManager {
     private static class LevelButton {
         int level;
         double x, y, width, height;
+
         LevelButton(int level, double x, double y, double width, double height) {
             this.level = level;
-            this.x = x; this.y = y; this.width = width; this.height = height;
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
         }
+
         boolean contains(double px, double py) {
             return px >= x && px <= x + width && py >= y && py <= y + height;
         }

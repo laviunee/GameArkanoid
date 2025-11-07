@@ -19,6 +19,7 @@ public abstract class UIElement {
     }
 
     public abstract void render(GraphicsContext gc);
+
     public abstract void update(double deltaTime);
 
     public boolean contains(double px, double py) {
@@ -34,12 +35,35 @@ public abstract class UIElement {
     }
 
     // Getters & Setters
-    public double getX() { return x; }
-    public double getY() { return y; }
-    public double getWidth() { return width; }
-    public double getHeight() { return height; }
-    public boolean isVisible() { return visible; }
-    public void setVisible(boolean visible) { this.visible = visible; }
-    public boolean isInteractive() { return interactive; }
-    public void setInteractive(boolean interactive) { this.interactive = interactive; }
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    public boolean isInteractive() {
+        return interactive;
+    }
+
+    public void setInteractive(boolean interactive) {
+        this.interactive = interactive;
+    }
 }

@@ -168,5 +168,7 @@ public class PauseScene extends SceneManager {
         ctx.setTextAlign(originalAlignment);
     }
 
-    public boolean isActive() { return isActive; }
+    public boolean isActive() {
+        return isActive;
+    }
 }

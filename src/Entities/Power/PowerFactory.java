@@ -1,9 +1,10 @@
 package Entities.Power;
 
-import java.util.Random;
-import java.util.List;
 import Entities.Ball;
 import UI.GameScene;
+
+import java.util.List;
+import java.util.Random;
 
 
 public class PowerFactory {
@@ -31,14 +32,22 @@ public class PowerFactory {
 
         int type = random.nextInt(5); // chọn loại power-up
         switch (type) {
-            case 0: return new ExpandPaddle(x, y);
-            case 1: return new FastBall(x, y);
+            case 0:
+                return new ExpandPaddle(x, y);
+            case 1:
+                return new FastBall(x, y);
             case 2:
                 if (sharedBalls != null) return new PowerUpMultiBall(x, y, sharedBalls);
-                else { System.err.println("PowerFactory: balls list not set!"); return null; }
-            case 3: return new PowerUpExtraLive(x, y, gameScene);
-            case 4: return new PowerUpPierceBall(x, y);
-            default: return null;
+                else {
+                    System.err.println("PowerFactory: balls list not set!");
+                    return null;
+                }
+            case 3:
+                return new PowerUpExtraLive(x, y, gameScene);
+            case 4:
+                return new PowerUpPierceBall(x, y);
+            default:
+                return null;
         }
     }
 

@@ -1,6 +1,5 @@
 package Engine;
 
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
 
 /**
@@ -8,8 +7,12 @@ import javafx.scene.input.KeyEvent;
  */
 public abstract class SceneManager {
     public abstract void start();
+
     public abstract void update(double deltaTime);
+
     public abstract void render();
+
     public abstract void handleInput(KeyEvent event);
+
     public abstract void cleanup();
 }

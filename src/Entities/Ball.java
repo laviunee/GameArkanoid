@@ -5,17 +5,11 @@ import Utils.Config;
 import javafx.scene.paint.Color;
 
 public class Ball extends MovableObject {
-    private double radius;
+    private final double radius;
     private boolean active;
     private boolean onPaddle;
-
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
     private Color color;
     private boolean pierce = false;
-
 
     public Ball(double x, double y) {
         super("Ball", x, y);
@@ -23,18 +17,8 @@ public class Ball extends MovableObject {
         this.active = false;
         this.onPaddle = true;
         this.color = Color.WHITE;
-
         setVelocity(0, 0);
     }
-
-    public void setPierce(boolean pierce) {
-        this.pierce = pierce;
-    }
-
-    public boolean isPierce() {
-        return pierce;
-    }
-
 
     @Override
     public void start() {
@@ -47,10 +31,7 @@ public class Ball extends MovableObject {
 
         // debug: Hiển thị thông tin ball
         if (Math.random() < 0.005) {
-            System.out.println("Ball - Pos: (" + String.format("%.1f", position.x) + ", " +
-                    String.format("%.1f", position.y) + ") Vel: (" +
-                    String.format("%.1f", velocity.x) + ", " +
-                    String.format("%.1f", velocity.y) + ")");
+            System.out.println("Ball - Pos: (" + String.format("%.1f", position.x) + ", " + String.format("%.1f", position.y) + ") Vel: (" + String.format("%.1f", velocity.x) + ", " + String.format("%.1f", velocity.y) + ")");
         }
 
         super.update(deltaTime);
@@ -74,7 +55,7 @@ public class Ball extends MovableObject {
     public void followPaddle(double paddleX, double paddleY, double paddleHeight) {
         if (onPaddle) {
             position.x = paddleX;
-            position.y = paddleY - paddleHeight/2 - radius - 1;
+            position.y = paddleY - paddleHeight / 2 - radius - 1;
         }
     }
 
@@ -92,6 +73,18 @@ public class Ball extends MovableObject {
 
     public Color getColor() {
         return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public void setPierce(boolean pierce) {
+        this.pierce = pierce;
+    }
+
+    public boolean isPierce() {
+        return pierce;
     }
 
 }

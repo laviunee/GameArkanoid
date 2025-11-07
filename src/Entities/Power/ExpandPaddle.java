@@ -1,9 +1,7 @@
 package Entities.Power;
 
-import Entities.Paddle;
 import Entities.Ball;
-import Utils.Config;
-import javafx.scene.paint.Color;
+import Entities.Paddle;
 
 public class ExpandPaddle extends PowerUp {
     private static final double EXPAND_FACTOR = 1.5;

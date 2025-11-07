@@ -27,7 +27,7 @@ public class MenuScene extends SceneManager {
     // Menu state
     private boolean isActive;
     private int selectedOption;
-    private final String[] mainOptions = {"START GAME", "LEVEL SELECT", "INSTRUCTION", "CREDITS", "HIGHSCORE" , "EXIT"}; // THÊM LEVEL SELECT
+    private final String[] mainOptions = {"START GAME", "LEVEL SELECT", "INSTRUCTION", "CREDITS", "HIGHSCORE", "EXIT"}; // THÊM LEVEL SELECT
     private MenuState currentState;
     private long lastInputTime;
 
@@ -356,9 +356,18 @@ public class MenuScene extends SceneManager {
 
     private void handleMainMenuInput(KeyEvent event) {
         switch (event.getCode()) {
-            case UP, W -> { moveSelectionUp(); soundManager.playSound("hit"); }
-            case DOWN, S -> { moveSelectionDown(); soundManager.playSound("hit"); }
-            case ENTER -> { selectMainMenuOption(); soundManager.playSound("powerup"); }
+            case UP, W -> {
+                moveSelectionUp();
+                soundManager.playSound("hit");
+            }
+            case DOWN, S -> {
+                moveSelectionDown();
+                soundManager.playSound("hit");
+            }
+            case ENTER -> {
+                selectMainMenuOption();
+                soundManager.playSound("powerup");
+            }
             case M -> toggleSound();
             case ESCAPE -> exitGame();
         }
@@ -387,7 +396,7 @@ public class MenuScene extends SceneManager {
     private void selectMainMenuOption() {
         switch (selectedOption) {
             case 0 -> startGame();           // START GAME
-            case 1 -> showLevelSelect();     // LEVEL SELECT ← THÊM
+            case 1 -> showLevelSelect();     // LEVEL SELECT
             case 2 -> showInstruction();     // INSTRUCTION
             case 3 -> showCredits();         // CREDITS
             case 4 -> showHighscore();       // HIGHSCORE
@@ -450,7 +459,15 @@ public class MenuScene extends SceneManager {
         isActive = false;
     }
 
-    public boolean isActive() { return isActive; }
-    public MenuState getCurrentState() { return currentState; }
-    public int getSelectedOption() { return selectedOption; }
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public MenuState getCurrentState() {
+        return currentState;
+    }
+
+    public int getSelectedOption() {
+        return selectedOption;
+    }
 }

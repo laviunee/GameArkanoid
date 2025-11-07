@@ -1,11 +1,9 @@
 package Engine;
 
 import Entities.Ball;
-import Entities.Paddle;
 import Entities.Bricks.Brick;
+import Entities.Paddle;
 import Utils.Config;
-
-import java.util.List;
 
 public class CollisionManager {
 
@@ -22,10 +20,10 @@ public class CollisionManager {
         double paddleHeight = paddle.getHeight();
 
         // Kiểm tra va chạm
-        boolean isColliding = ballY + ballRadius >= paddleY - paddleHeight/2 &&
-                ballY - ballRadius <= paddleY + paddleHeight/2 &&
-                ballX + ballRadius >= paddleX - paddleWidth/2 &&
-                ballX - ballRadius <= paddleX + paddleWidth/2;
+        boolean isColliding = ballY + ballRadius >= paddleY - paddleHeight / 2 &&
+                ballY - ballRadius <= paddleY + paddleHeight / 2 &&
+                ballX + ballRadius >= paddleX - paddleWidth / 2 &&
+                ballX - ballRadius <= paddleX + paddleWidth / 2;
 
         if (isColliding && ball.getVelocity().y > 0) {
             handlePaddleBounce(ball, paddle, ballX, ballY, paddleX, paddleY, paddleWidth, paddleHeight);
@@ -60,7 +58,7 @@ public class CollisionManager {
 
         // Đặt velocity và vị trí mới
         ball.setVelocity(newVX, newVY);
-        ball.getPosition().y = paddleY - paddleHeight/2 - ballRadius - 1;
+        ball.getPosition().y = paddleY - paddleHeight / 2 - ballRadius - 1;
 
         System.out.println("Paddle collision - HitPos: " + hitPosition +
                 ", Angle: " + bounceAngle + "°, Speed: " + speed);

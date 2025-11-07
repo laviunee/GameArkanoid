@@ -118,8 +118,14 @@ public class GameOverScene extends SceneManager {
 
         if (event.getEventType() == KeyEvent.KEY_PRESSED) {
             switch (event.getCode()) {
-                case A, UP, W -> { selectedOption = (selectedOption - 1 + gameOverOptions.length) % gameOverOptions.length; soundManager.playSound("hit"); }
-                case D, DOWN, S -> { selectedOption = (selectedOption + 1) % gameOverOptions.length; soundManager.playSound("hit"); }
+                case A, UP, W -> {
+                    selectedOption = (selectedOption - 1 + gameOverOptions.length) % gameOverOptions.length;
+                    soundManager.playSound("hit");
+                }
+                case D, DOWN, S -> {
+                    selectedOption = (selectedOption + 1) % gameOverOptions.length;
+                    soundManager.playSound("hit");
+                }
                 case ENTER, SPACE -> {
                     if (selectedOption == 0) restartGame();
                     else returnToMenu();
@@ -188,5 +194,7 @@ public class GameOverScene extends SceneManager {
         isActive = false;
     }
 
-    public boolean isActive() { return isActive; }
+    public boolean isActive() {
+        return isActive;
+    }
 }

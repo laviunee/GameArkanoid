@@ -42,12 +42,12 @@ public class Paddle extends MovableObject {
         super.update(deltaTime);
 
         // Giới hạn paddle trong màn hình
-        if (position.x < Config.INSET + width/2) {
-            position.x = Config.INSET + width/2;
+        if (position.x < Config.INSET + width / 2) {
+            position.x = Config.INSET + width / 2;
             velocity.x = 0; // Dừng lại khi chạm biên
         }
-        if (position.x > Config.SCREEN_WIDTH - Config.INSET - width/2) {
-            position.x = Config.SCREEN_WIDTH - Config.INSET - width/2;
+        if (position.x > Config.SCREEN_WIDTH - Config.INSET - width / 2) {
+            position.x = Config.SCREEN_WIDTH - Config.INSET - width / 2;
             velocity.x = 0; // Dừng lại khi chạm biên
         }
     }
@@ -71,11 +71,11 @@ public class Paddle extends MovableObject {
         double newX = mouseX;
 
         // Giới hạn vị trí để paddle không ra khỏi màn hình
-        if (newX < Config.INSET + width/2) {
-            newX = Config.INSET + width/2;
+        if (newX < Config.INSET + width / 2) {
+            newX = Config.INSET + width / 2;
         }
-        if (newX > Config.SCREEN_WIDTH - Config.INSET - width/2) {
-            newX = Config.SCREEN_WIDTH - Config.INSET - width/2;
+        if (newX > Config.SCREEN_WIDTH - Config.INSET - width / 2) {
+            newX = Config.SCREEN_WIDTH - Config.INSET - width / 2;
         }
 
         // Đặt vị trí trực tiếp (không dùng velocity)
@@ -87,11 +87,11 @@ public class Paddle extends MovableObject {
         double targetX = mouseX;
 
         // Giới hạn vị trí đích
-        if (targetX < Config.INSET + width/2) {
-            targetX = Config.INSET + width/2;
+        if (targetX < Config.INSET + width / 2) {
+            targetX = Config.INSET + width / 2;
         }
-        if (targetX > Config.SCREEN_WIDTH - Config.INSET - width/2) {
-            targetX = Config.SCREEN_WIDTH - Config.INSET - width/2;
+        if (targetX > Config.SCREEN_WIDTH - Config.INSET - width / 2) {
+            targetX = Config.SCREEN_WIDTH - Config.INSET - width / 2;
         }
 
         // Tính toán hướng và tốc độ di chuyển

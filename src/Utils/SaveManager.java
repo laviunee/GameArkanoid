@@ -42,10 +42,22 @@ public class SaveManager {
         }
 
         // Getters
-        public String getPlayerName() { return playerName; }
-        public int getScore() { return score; }
-        public int getLevel() { return level; }
-        public long getTimestamp() { return timestamp; }
+        public String getPlayerName() {
+            return playerName;
+        }
+
+        public int getScore() {
+            return score;
+        }
+
+        public int getLevel() {
+            return level;
+        }
+
+        public long getTimestamp() {
+            return timestamp;
+        }
+
         public String getFormattedDate() {
             return new Date(timestamp).toString();
         }
@@ -67,8 +79,13 @@ public class SaveManager {
         }
 
         // Getters and setters
-        public int getUnlockedLevels() { return unlockedLevels; }
-        public void setUnlockedLevels(int unlockedLevels) { this.unlockedLevels = unlockedLevels; }
+        public int getUnlockedLevels() {
+            return unlockedLevels;
+        }
+
+        public void setUnlockedLevels(int unlockedLevels) {
+            this.unlockedLevels = unlockedLevels;
+        }
 
         public boolean isLevelCompleted(int level) {
             return levelCompleted.getOrDefault(level, false);
@@ -86,8 +103,13 @@ public class SaveManager {
             levelScores.put(level, score);
         }
 
-        public int getTotalScore() { return totalScore; }
-        public void setTotalScore(int totalScore) { this.totalScore = totalScore; }
+        public int getTotalScore() {
+            return totalScore;
+        }
+
+        public void setTotalScore(int totalScore) {
+            this.totalScore = totalScore;
+        }
     }
 
     // === HIGHSCORE METHODS ===

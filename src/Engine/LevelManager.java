@@ -17,18 +17,18 @@ public class LevelManager {
     // === LEVEL DESIGNS ===
     private static final BrickType[][] LEVEL_1 = {
             {BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL},
-            {BrickType.NORMAL, BrickType.NONE,    BrickType.NONE,    BrickType.NONE,    BrickType.NONE,    BrickType.NONE,    BrickType.NONE,    BrickType.NORMAL},
-            {BrickType.NORMAL, BrickType.NONE,    BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.NONE,    BrickType.NORMAL},
-            {BrickType.NORMAL, BrickType.NONE,    BrickType.NONE,    BrickType.NONE,    BrickType.NONE,    BrickType.NONE,    BrickType.NONE,    BrickType.NORMAL},
+            {BrickType.NORMAL, BrickType.NONE, BrickType.NONE, BrickType.NONE, BrickType.NONE, BrickType.NONE, BrickType.NONE, BrickType.NORMAL},
+            {BrickType.NORMAL, BrickType.NONE, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.NONE, BrickType.NORMAL},
+            {BrickType.NORMAL, BrickType.NONE, BrickType.NONE, BrickType.NONE, BrickType.NONE, BrickType.NONE, BrickType.NONE, BrickType.NORMAL},
             {BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL}
     };
 
     private static final BrickType[][] LEVEL_2 = {
-            {BrickType.STRONG, BrickType.NONE,    BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NONE,    BrickType.STRONG},
-            {BrickType.NONE,    BrickType.STRONG, BrickType.NONE,    BrickType.NORMAL, BrickType.NORMAL, BrickType.NONE,    BrickType.STRONG, BrickType.NONE},
-            {BrickType.NORMAL, BrickType.NONE,    BrickType.STRONG, BrickType.NONE,    BrickType.NONE,    BrickType.STRONG, BrickType.NONE,    BrickType.NORMAL},
-            {BrickType.NONE,    BrickType.STRONG, BrickType.NONE,    BrickType.NORMAL, BrickType.NORMAL, BrickType.NONE,    BrickType.STRONG, BrickType.NONE},
-            {BrickType.STRONG, BrickType.NONE,    BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NONE,    BrickType.STRONG}
+            {BrickType.STRONG, BrickType.NONE, BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NONE, BrickType.STRONG},
+            {BrickType.NONE, BrickType.STRONG, BrickType.NONE, BrickType.NORMAL, BrickType.NORMAL, BrickType.NONE, BrickType.STRONG, BrickType.NONE},
+            {BrickType.NORMAL, BrickType.NONE, BrickType.STRONG, BrickType.NONE, BrickType.NONE, BrickType.STRONG, BrickType.NONE, BrickType.NORMAL},
+            {BrickType.NONE, BrickType.STRONG, BrickType.NONE, BrickType.NORMAL, BrickType.NORMAL, BrickType.NONE, BrickType.STRONG, BrickType.NONE},
+            {BrickType.STRONG, BrickType.NONE, BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NORMAL, BrickType.NONE, BrickType.STRONG}
     };
 
     private static final BrickType[][] LEVEL_3 = {
@@ -48,11 +48,11 @@ public class LevelManager {
     };
 
     private static final BrickType[][] LEVEL_5 = {
-            {BrickType.NONE,    BrickType.NONE,    BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.NONE,    BrickType.NONE},
-            {BrickType.NONE,    BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.NONE},
+            {BrickType.NONE, BrickType.NONE, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.NONE, BrickType.NONE},
+            {BrickType.NONE, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.NONE},
             {BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG},
-            {BrickType.NONE,    BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.NONE},
-            {BrickType.NONE,    BrickType.NONE,    BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.NONE,    BrickType.NONE}
+            {BrickType.NONE, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.NONE},
+            {BrickType.NONE, BrickType.NONE, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.STRONG, BrickType.NONE, BrickType.NONE}
     };
 
     private static final List<BrickType[][]> LEVELS = List.of(LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5);

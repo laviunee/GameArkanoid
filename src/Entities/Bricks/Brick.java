@@ -1,8 +1,6 @@
 package Entities.Bricks;
 
 import Core.GameObject;
-import Utils.Vector2D;
-import javafx.scene.canvas.GraphicsContext;
 
 /**
  * Lớp cha cho tất cả các loại gạch
@@ -47,11 +45,25 @@ public abstract class Brick extends GameObject {
     }
 
     // Getter methods
-    public double getWidth() { return width; }
-    public double getHeight() { return height; }
-    public int getHitPoints() { return hitPoints; }
-    public int getScoreValue() { return scoreValue; }
-    public boolean isToBeRemoved() { return toBeRemoved; }
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public int getHitPoints() {
+        return hitPoints;
+    }
+
+    public int getScoreValue() {
+        return scoreValue;
+    }
+
+    public boolean isToBeRemoved() {
+        return toBeRemoved;
+    }
 
     // Kiểm tra va chạm đơn giản
     public boolean collidesWith(double ballX, double ballY, double ballRadius) {

@@ -1,6 +1,7 @@
 package Utils;
 
 import javafx.scene.image.Image;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ public class SpriteLoader {
             java.io.InputStream is = getClass().getResourceAsStream(path);
             if (is == null) {
                 System.err.println("InputStream is NULL for: " + path);
-                return createPlaceholder((int)width, (int)height);
+                return createPlaceholder((int) width, (int) height);
             }
 
             Image image;
@@ -51,7 +52,7 @@ public class SpriteLoader {
 
         } catch (Exception e) {
             System.err.println("Exception loading: " + path);
-            return createPlaceholder((int)width, (int)height);
+            return createPlaceholder((int) width, (int) height);
         }
     }
 
@@ -67,7 +68,7 @@ public class SpriteLoader {
         gc.setStroke(javafx.scene.paint.Color.BLACK);
         gc.strokeRect(0, 0, w, h);
         gc.setFill(javafx.scene.paint.Color.WHITE);
-        gc.fillText("IMG", w/2-10, h/2+5);
+        gc.fillText("IMG", w / 2 - 10, h / 2 + 5);
 
         return canvas.snapshot(null, null);
     }

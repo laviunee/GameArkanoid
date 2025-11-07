@@ -59,19 +59,50 @@ public class Collider {
     }
 
     // Bounds properties từ code cũ
-    public double getMinX() { return position.x; }
-    public double getMinY() { return position.y; }
-    public double getMaxX() { return position.x + width; }
-    public double getMaxY() { return position.y + height; }
-    public double getCenterX() { return position.x + width * 0.5; }
-    public double getCenterY() { return position.y + height * 0.5; }
+    public double getMinX() {
+        return position.x;
+    }
+
+    public double getMinY() {
+        return position.y;
+    }
+
+    public double getMaxX() {
+        return position.x + width;
+    }
+
+    public double getMaxY() {
+        return position.y + height;
+    }
+
+    public double getCenterX() {
+        return position.x + width * 0.5;
+    }
+
+    public double getCenterY() {
+        return position.y + height * 0.5;
+    }
 
     // Getters
-    public Vector2D getPosition() { return position; }
-    public double getWidth() { return width; }
-    public double getHeight() { return height; }
-    public boolean isEnabled() { return enabled; }
-    public void setEnabled(boolean enabled) { this.enabled = enabled; }
+    public Vector2D getPosition() {
+        return position;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     @Override
     public String toString() {

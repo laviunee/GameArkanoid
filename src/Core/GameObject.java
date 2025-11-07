@@ -1,8 +1,9 @@
 package Core;
 
 import Utils.Vector2D;
-import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+
 /**
  * Lớp cha cho mọi đối tượng trong game
  */
@@ -40,13 +41,25 @@ public abstract class GameObject {
 
     // Phương thức trừu tượng
     public abstract void start();
+
     public abstract void update(double deltaTime);
 
     // Getter/Setter
-    public String getName() { return name; }
-    public boolean isActive() { return active; }
-    public void setActive(boolean active) { this.active = active; }
-    public Vector2D getPosition() { return position; }
+    public String getName() {
+        return name;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public Vector2D getPosition() {
+        return position;
+    }
 
     public void setPosition(double x, double y) {
         position.set(x, y);

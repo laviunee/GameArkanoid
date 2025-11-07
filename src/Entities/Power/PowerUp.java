@@ -1,8 +1,8 @@
 package Entities.Power;
 
 import Core.GameObject;
-import Entities.Paddle;
 import Entities.Ball;
+import Entities.Paddle;
 import Utils.Config;
 
 public abstract class PowerUp extends GameObject {
@@ -31,8 +31,13 @@ public abstract class PowerUp extends GameObject {
         }
     }
 
-    public boolean isCollected() { return collected; }
-    public void collect() { collected = true; }
+    public boolean isCollected() {
+        return collected;
+    }
+
+    public void collect() {
+        collected = true;
+    }
 
     public abstract void applyEffect(Paddle paddle, Ball ball);
 }

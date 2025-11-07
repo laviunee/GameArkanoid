@@ -1,7 +1,7 @@
 package Entities.Power;
 
-import Entities.Paddle;
 import Entities.Ball;
+import Entities.Paddle;
 import UI.GameScene;
 import javafx.scene.image.Image;
 

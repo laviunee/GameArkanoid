@@ -32,7 +32,10 @@ public abstract class MovableObject extends GameObject {
         position.y += velocity.y * deltaTime;
     }
 
-    public Vector2D getVelocity() { return velocity; }
+    public Vector2D getVelocity() {
+        return velocity;
+    }
+
     public void setVelocity(double vx, double vy) {
         velocity.set(vx, vy);
     }
